@@ -3,6 +3,30 @@ use std::process::exit;
 
 fn create_random_maze(){
   print!("{}[2J", 27 as char);//Ref. 1
+  println!("Please select the size of your maze. The minimum is 10x10 with a max size of 120x120.  All you need to do is type a single number and the maze will be created in a x by x maze based on the number you typed in.  If you would like to go back, please type 'back'.");
+    //Ref. 2 begin
+    let mut s=String::new();
+    let _=stdout().flush();
+    stdin().read_line(&mut s).expect("Did not enter a correct string");
+    if let Some('\n')=s.chars().next_back() {
+        s.pop();
+    }
+    if let Some('\r')=s.chars().next_back() {
+        s.pop();
+    }
+    //Ref. 2 end
+    if s.to_lowercase()  == "back"{
+        print!("{}[2J", 27 as char);//Ref. 1
+	return main_menu();
+    }
+    let _test = s.parse::<i32>();
+     if _test.is_err(){
+	return create_random_maze();
+    }
+     let _num:i32 = s.parse().unwrap();
+     if _num < 10 || _num > 120{
+	return create_random_maze();
+    }
   maze_solving_strategy();
 }
 
