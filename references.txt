@@ -1,0 +1,8 @@
+Referece 1:
+https://stackoverflow.com/questions/34837011/how-to-clear-terminal-screen-in-rust-after-new-line-is-printing/34837038
+
+Reference 2:
+https://users.rust-lang.org/t/how-to-get-user-input/5176/2 by user: jethrogb
+
+Reference 3:
+
