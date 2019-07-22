@@ -1,6 +1,6 @@
 
 mod menu;
-//mod running_alg;
+mod running_alg;
 
 fn main() {
 
