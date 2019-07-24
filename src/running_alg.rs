@@ -4,13 +4,26 @@ use std::io::Read;
 //use std::path::Path;
 use std::env;
 
+  pub struct Player {
+  pub x: u64,
+  pub y: u64,
+  pub strategy: String,
+  }
+  pub struct Maze_locations{
+  pub start_x: u64,
+  pub start_y: u64,
+  pub finish_x: u64,
+  pub finish_y: u64,
+  pub maze: Vec<(Vec<(char)>)>,
+  }
+
 pub fn generate_maze()
 {
 	println!("We are in the maze generator.");
 }
 
 
-pub fn load_maze(file_name: String){
+pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
   let p = env::current_dir().unwrap();//ref 4
   let mut path = p.display().to_string();
   println!("Current directory: {}",path);
@@ -41,10 +54,19 @@ pub fn load_maze(file_name: String){
     }
     iter+= 1;
   }
+  maze
 }
 
-/*
-pub fn display_maze(maze: Vec)
+pub fn begin_game(strategy: String, maze: Vec<(Vec<(char)>)>)
+{ 
+  //let mut player1 = Player{x:0,y:0};
+  let mut points = find_maze_points(maze); 
+  print!("{}[2J", 27 as char);//Ref. 1
+  //display_maze(maze);
+}
+
+
+pub fn display_maze(maze: Vec<(Vec<(char)>)>)
 {
   for i in 0..maze.len()
   {
@@ -54,4 +76,10 @@ pub fn display_maze(maze: Vec)
     }
     println!();
   }
-}*/
+}
+
+fn find_maze_points(maze: Vec<(Vec<(char)>)>)->[u64;4]
+{
+let mut coordinates: [u64;4]=[0,0,0,0];
+coordinates
+}

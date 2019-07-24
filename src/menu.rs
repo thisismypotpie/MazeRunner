@@ -1,6 +1,7 @@
 use std::io::{stdin,stdout,Write};
 use std::process::exit;
 use crate::running_alg::load_maze;
+use crate::running_alg::begin_game;
 
 fn create_random_maze()-> String{
   print!("{}[2J", 27 as char);//Ref. 1
@@ -94,8 +95,10 @@ pub fn main_menu(){
         let choice = load_in_maze();
         if choice.to_lowercase() != "back"
 	{
-          maze_solving_strategy();
-          load_maze(choice);
+          //maze_solving_strategy();
+          //load_maze(choice);
+	  begin_game(maze_solving_strategy(),load_maze(choice));
+          exit(0);
 	}	
     }
     else if s == "3"{//help options
