@@ -9,14 +9,14 @@ use std::env;
   pub y: u64,
   pub strategy: String,
   }
-  pub struct Maze_locations{
+  pub struct Maze{
   pub start_x: u64,
   pub start_y: u64,
   pub finish_x: u64,
   pub finish_y: u64,
-  pub maze: Vec<(Vec<(char)>)>,
+  pub map: Vec<(Vec<(char)>)>,
   }
-
+  
 pub fn generate_maze()
 {
 	println!("We are in the maze generator.");
@@ -57,22 +57,31 @@ pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
   maze
 }
 
-pub fn begin_game(strategy: String, maze: Vec<(Vec<(char)>)>)
+pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
 { 
-  //let mut player1 = Player{x:0,y:0};
-  let mut points = find_maze_points(maze); 
+  let mut player1 = Player{x:0,y:0,strategy:strat};
+  let mut maze = Maze{start_x:0,start_y:0,finish_x:0,finish_y:0,map:maize};
+  let mut points = find_maze_points(maze.map); 
+  player1.x = points[0];
+  player1.y = points[1];
+  maze.start_x = points[0];
+  maze.start_y = points[1];
+  maze.finish_x = points[2];
+  maze.finish_y = points[3]; 
   print!("{}[2J", 27 as char);//Ref. 1
-  //display_maze(maze);
+  println!("Ready sarge!{}{}{}{}",points[0],points[1],points[2],points[3]);
+  maze.map[player1.x as usize][player1.y as usize]='U';
+  display_maze(maze);
 }
 
 
-pub fn display_maze(maze: Vec<(Vec<(char)>)>)
+pub fn display_maze(maze: Maze)
 {
-  for i in 0..maze.len()
+  for i in 0..maze.map.len()
   {
-    for j in 0..maze[i].len()
+    for j in 0..maze.map[i].len()
     {
-      print!("{}",maze[i][j].to_string());
+      print!("{}",maze.map[i][j].to_string());
     }
     println!();
   }
@@ -80,6 +89,26 @@ pub fn display_maze(maze: Vec<(Vec<(char)>)>)
 
 fn find_maze_points(maze: Vec<(Vec<(char)>)>)->[u64;4]
 {
-let mut coordinates: [u64;4]=[0,0,0,0];
+let mut coordinates: [u64;4]=[(maze.len()+1)as u64,(maze.len()+1)as u64,(maze.len()+1)as u64,(maze.len()+1)as u64];
+for i in 0..maze.len()
+{
+  for j in 0..maze[i].len()
+  {
+    if maze[i][j] == 's'
+    {
+      coordinates[0] = i as u64;
+      coordinates[1] = j as u64;
+    }
+    else if maze[i][j] == 'f'
+    {
+      coordinates[2] = i as u64;
+      coordinates[3] = j as u64;
+    }
+    if coordinates[0] != (maze.len()+1)as u64 &&coordinates[1] != (maze.len()+1)as u64 &&coordinates[2] != (maze.len()+1)as u64 &&coordinates[3] != (maze.len()+1)as u64
+    {
+      return coordinates;
+    }
+  }
+}
 coordinates
 }
