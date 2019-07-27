@@ -9,12 +9,40 @@ use std::env;
   pub y: u64,
   pub strategy: String,
   }
+  impl Player{
+    fn set_x(&self)-> &u64 {
+      &self.x
+    }
+    fn set_y(&self)-> &u64 {
+      &self.y
+    }
+    fn set_strategy(&self)-> &String {
+      &self.strategy
+    }
+  }
   pub struct Maze{
   pub start_x: u64,
   pub start_y: u64,
   pub finish_x: u64,
   pub finish_y: u64,
   pub map: Vec<(Vec<(char)>)>,
+  }
+  impl Maze{
+    fn set_start_x(&self)->&u64 {
+      &self.start_x
+    }
+    fn set_start_y(&self)->&u64 {
+      &self.start_y
+    }
+    fn set_finish_x(&self)->&u64 {
+      &self.finish_x
+    }
+    fn set_finish_y(&self)->&u64 {
+      &self.finish_y
+    }
+    fn set_map_coord(&self,x:usize,y:usize)->&char {
+      &self.map[x][y] 
+    }
   }
   
 pub fn generate_maze()
@@ -60,8 +88,8 @@ pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
 pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
 { 
   let mut player1 = Player{x:0,y:0,strategy:strat};
-  let mut maze = Maze{start_x:0,start_y:0,finish_x:0,finish_y:0,map:maize};
-  let mut points = find_maze_points(maze.map); 
+  let mut maze = Maze{start_x:0,start_y:0,finish_x:0,finish_y:0,map:maize.clone()};
+  let mut points = find_maze_points(&maze.map); 
   player1.x = points[0];
   player1.y = points[1];
   maze.start_x = points[0];
@@ -87,7 +115,7 @@ pub fn display_maze(maze: Maze)
   }
 }
 
-fn find_maze_points(maze: Vec<(Vec<(char)>)>)->[u64;4]
+fn find_maze_points(maze: &std::vec::Vec<(Vec<(char)>)>)->[u64;4]
 {
 let mut coordinates: [u64;4]=[(maze.len()+1)as u64,(maze.len()+1)as u64,(maze.len()+1)as u64,(maze.len()+1)as u64];
 for i in 0..maze.len()
