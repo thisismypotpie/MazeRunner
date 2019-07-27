@@ -1,14 +1,16 @@
 use std::fs::File;
-//use std::io::BufReader;
 use std::io::Read;
-//use std::path::Path;
 use std::env;
+use std::process::Command;
+use std::io;
+use std::io::prelude::*;
 
   pub struct Player {
   pub x: u64,
   pub y: u64,
   pub strategy: String,
   }
+  //reference 5 begin
   impl Player{
     fn set_x(&self)-> &u64 {
       &self.x
@@ -20,6 +22,7 @@ use std::env;
       &self.strategy
     }
   }
+  //reference 5 end
   pub struct Maze{
   pub start_x: u64,
   pub start_y: u64,
@@ -27,6 +30,7 @@ use std::env;
   pub finish_y: u64,
   pub map: Vec<(Vec<(char)>)>,
   }
+  //reference 5 begin
   impl Maze{
     fn set_start_x(&self)->&u64 {
       &self.start_x
@@ -44,6 +48,7 @@ use std::env;
       &self.map[x][y] 
     }
   }
+  //reference 5 end
   
 pub fn generate_maze()
 {
@@ -52,7 +57,7 @@ pub fn generate_maze()
 
 
 pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
-  let p = env::current_dir().unwrap();//ref 4
+  let p = env::current_dir().unwrap();//ref 3
   let mut path = p.display().to_string();
   println!("Current directory: {}",path);
   let test = &path[path.len()-3..path.len()];
@@ -99,11 +104,18 @@ pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
   print!("{}[2J", 27 as char);//Ref. 1
   println!("Ready sarge!{}{}{}{}",points[0],points[1],points[2],points[3]);
   maze.map[player1.x as usize][player1.y as usize]='U';
-  display_maze(maze);
+  display_maze(&maze);
+  game_loop(player1,maze);
 }
 
 
-pub fn display_maze(maze: Maze)
+fn game_loop(player1: Player, maze: Maze)
+{
+  
+}
+
+
+pub fn display_maze(maze: &Maze)
 {
   for i in 0..maze.map.len()
   {
