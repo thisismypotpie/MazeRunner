@@ -14,46 +14,13 @@ use termion::clear;
   pub strategy: String,
   pub underfoot: char,
   }
-  //reference 5 begin
-  impl Player{
-    fn set_x(& self)-> & u64 {
-      &self.x
-    }
-    fn set_y(&self)-> &u64 {
-      &self.y
-    }
-    fn set_strategy(&self)-> &String {
-      &self.strategy
-    }
-  }
-  //reference 5 end
   pub struct Maze{
   pub start_x: u64,
   pub start_y: u64,
   pub finish_x: u64,
   pub finish_y: u64,
   pub map: Vec<(Vec<(char)>)>,
-  }
-  //reference 5 begin
-  impl Maze{
-    fn set_start_x(&self)->&u64 {
-      &self.start_x
-    }
-    fn set_start_y(&self)->&u64 {
-      &self.start_y
-    }
-    fn set_finish_x(&self)->&u64 {
-      &self.finish_x
-    }
-    fn set_finish_y(&self)->&u64 {
-      &self.finish_y
-    }
-    fn set_map_coord(&self,x:usize,y:usize)->&char {
-      &self.map[x][y] 
-    }
-  }
-  //reference 5 end
-  
+  } 
 pub fn generate_maze()
 {
 	println!("We are in the maze generator.");
@@ -155,6 +122,10 @@ fn game_loop(mut player1: Player, mut maze: Maze)
        maze.map[player1.x as usize][player1.y as usize] = 'U'; 
        display_maze(&maze);
      } 
+     else
+     {
+       println!("You cannot go that way!");
+     }
    }
 }
 
@@ -191,6 +162,7 @@ fn get_input_direction()->char
 
 pub fn display_maze(maze: &Maze)
 {
+  println!("{}",clear::All);
   for i in 0..maze.map.len()
   {
     for j in 0..maze.map[i].len()

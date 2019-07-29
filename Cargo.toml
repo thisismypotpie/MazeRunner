@@ -5,3 +5,4 @@ authors = ["bld <bld@pdx.edu>"]
 edition = "2018"
 
 [dependencies]
+termion = "*"

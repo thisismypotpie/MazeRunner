@@ -1,3 +1,5 @@
+extern crate termion;
+use termion::clear;
 use std::io::{stdin,stdout,Write};
 use std::process::exit;
 use crate::running_alg::load_maze;
@@ -54,7 +56,8 @@ pub fn maze_solving_strategy()-> String{
 }
 pub fn load_in_maze()-> String//If a 2 is returned from main menu, this function is called from main.
 { 
-  print!("{}[2J", 27 as char);//Ref. 1
+  //print!("{}[2J", 27 as char);//Ref. 1
+  println!("{}", clear::All);
   println!("What is the name of the file you are loading? Make sure that the maze you are loading is in the maze directory above src.  Type 'back to go back to main menu.'");
     //Ref. 2 begin
     let mut s=String::new();

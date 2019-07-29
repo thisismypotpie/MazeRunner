@@ -6,3 +6,10 @@ https://users.rust-lang.org/t/how-to-get-user-input/5176/2 by user: jethrogb
 
 Reference 3:
 https://stackoverflow.com/questions/31192956/whats-the-de-facto-way-of-reading-and-writing-files-in-rust-1-x
+
+Reference 4:
+https://www.youtube.com/watch?v=8M0QfLUDaaA   <- This video helped to clear some thing up for me about ownership.
+
+Reference 6:
+https://github.com/redox-os/termion
+http://ticki.github.io/blog/making-terminal-applications-in-rust-with-termion/
