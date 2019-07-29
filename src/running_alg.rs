@@ -16,7 +16,7 @@ use termion::clear;
   }
   //reference 5 begin
   impl Player{
-    fn set_x(&self)-> &u64 {
+    fn set_x(& self)-> & u64 {
       &self.x
     }
     fn set_y(&self)-> &u64 {
@@ -113,20 +113,47 @@ pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
 }
 
 
-fn game_loop(player1: Player, maze: Maze)
+fn game_loop(mut player1: Player, mut maze: Maze)
 {
    let mut direction= ' ';
    while player1.underfoot != 'f'
    {
+     direction = get_input_direction();
      if direction == 'e'
      {
        exit(0);
      }   
-     if direction == 'u' && player1.x -1 >= 0 &&maze.map[player1.x-1][player1.y]=='_'
+     if direction == 'u'
      {
-       maze.map[player1.x][player1.y] = player1.underfoot;
-       player1.x = player1.x -1;
-       maze.map[player1.x][player1.y] = 'U'; 
+       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+       player1.x= player1.x -1;
+       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+       display_maze(&maze);
+     } 
+     else if direction == 'l'
+     {
+       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+       player1.y= player1.y -1;
+       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+       display_maze(&maze);
+     } 
+     else if direction == 'd'
+     {
+       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+       player1.x= player1.x +1;
+       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+       display_maze(&maze);
+     } 
+     else if direction == 'r'
+     {
+       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+       player1.y= player1.y +1;
+       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+       display_maze(&maze);
      } 
    }
 }
