@@ -1,14 +1,18 @@
+extern crate termion;
+use std::process::exit;
 use std::fs::File;
 use std::io::Read;
 use std::env;
-use std::process::Command;
-use std::io;
-use std::io::prelude::*;
-
+use termion::event::Key;
+use termion::input::TermRead;
+use termion::raw::IntoRawMode;
+use std::io::{stdout,stdin,Write};
+use termion::clear;
   pub struct Player {
   pub x: u64,
   pub y: u64,
   pub strategy: String,
+  pub underfoot: char,
   }
   //reference 5 begin
   impl Player{
@@ -92,7 +96,7 @@ pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
 
 pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
 { 
-  let mut player1 = Player{x:0,y:0,strategy:strat};
+  let mut player1 = Player{x:0,y:0,strategy:strat,underfoot:'s'};
   let mut maze = Maze{start_x:0,start_y:0,finish_x:0,finish_y:0,map:maize.clone()};
   let mut points = find_maze_points(&maze.map); 
   player1.x = points[0];
@@ -111,9 +115,52 @@ pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
 
 fn game_loop(player1: Player, maze: Maze)
 {
-  
+   let mut direction= ' ';
+   while player1.underfoot != 'f'
+   {
+     if direction == 'e'
+     {
+       exit(0);
+     }   
+     if direction == 'u' && player1.x -1 >= 0 &&maze.map[player1.x-1][player1.y]=='_'
+     {
+       maze.map[player1.x][player1.y] = player1.underfoot;
+       player1.x = player1.x -1;
+       maze.map[player1.x][player1.y] = 'U'; 
+     } 
+   }
 }
 
+
+//beign reference 6
+fn get_input_direction()->char
+{
+
+  let stdin = stdin();
+   //println!("Press any key to continue...");
+   let mut stdout = stdout().into_raw_mode().unwrap();
+   stdout.flush().unwrap();
+   for c in stdin.keys()
+   {
+     match c.unwrap()
+     { 
+       Key::Up => return 'u',
+       Key::Right => return 'r',
+       Key::Left => return 'l',
+       Key::Down => return 'd',
+       Key::Char('w') => return 'u',
+       Key::Char('a') => return 'l',
+       Key::Char('s') => return 'd',
+       Key::Char('d') => return 'r',
+       Key::Ctrl(c) => return'e',
+       _         => return 'x',
+     }
+  }
+  stdout.flush().unwrap();
+  write!(stdout, "{}",termion::cursor::Show).unwrap();
+  'x'
+}
+//end reference 6
 
 pub fn display_maze(maze: &Maze)
 {
