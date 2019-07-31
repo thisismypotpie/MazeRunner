@@ -104,38 +104,73 @@ fn game_loop(mut player1: Player, mut maze: Maze)
      }   
      if direction == 'u'&& player1.x > 0
      {
-       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
-       player1.x= player1.x -1;
-       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
-       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-       display_maze(&maze);
+       if maze.map[player1.x as usize-1][player1.y as usize]=='x'
+	{
+	  println!("You smack face first into a wall.");
+	  continue;
+	}	
+	else
+	{
+          maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+          player1.x= player1.x -1;
+          player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+          maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+          display_maze(&maze);
+	}
      } 
      else if direction == 'l'&& player1.y > 0
 
      {
-       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
-       player1.y= player1.y -1;
-       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
-       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-       display_maze(&maze);
+       if maze.map[player1.x as usize][player1.y as usize-1]=='x'
+	{
+	  println!("You smack face first into a wall.");
+	  continue;
+
+	}	
+	else
+	{
+          maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+          player1.y= player1.y -1;
+          player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+          maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+          display_maze(&maze);
+	}
      } 
      else if direction == 'd'&& player1.x +1 < maze.map.len() as u64 -1
 
      {
-       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
-       player1.x= player1.x +1;
-       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
-       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-       display_maze(&maze);
+       if maze.map[player1.x as usize+1][player1.y as usize]=='x'
+	{
+	  println!("You smack face first into a wall.");
+	  continue;
+
+	}	
+	else
+	{
+          maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+          player1.x= player1.x +1;
+          player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+          maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+          display_maze(&maze);
+	}
      } 
      else if direction == 'r'&& player1.y + 1 < maze.map[player1.x as usize].len()as u64
 
      {
-       maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
-       player1.y= player1.y +1;
-       player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
-       maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-       display_maze(&maze);
+       if maze.map[player1.x as usize][player1.y as usize+1]=='x'
+	{
+	  println!("You smack face first into a wall.");
+	  continue;
+
+	}	
+	else
+	{
+          maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
+          player1.y= player1.y +1;
+          player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
+          maze.map[player1.x as usize][player1.y as usize] = 'U'; 
+          display_maze(&maze);
+	}
      } 
      else
      {
