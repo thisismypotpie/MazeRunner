@@ -21,9 +21,21 @@ use termion::clear;
   pub finish_y: u64,
   pub map: Vec<(Vec<(char)>)>,
   } 
-pub fn generate_maze()
+pub fn generate_maze(info: Vec<String>, strat: String)
 {
-	println!("We are in the maze generator.");
+  let mut maze = Vec::new();
+  let mut iter = 0;
+  let width:u64 =info[0].parse::<u64>().unwrap();
+  let height:u64 = info[1].parse::<u64>().unwrap(); 
+  for s in 0..height
+  {
+    maze.push(Vec::new());
+    for i in 0..width
+    {
+      maze[iter].push('x'); 
+    }
+    iter+= 1;
+  }            
 }
 
 
@@ -90,7 +102,7 @@ fn game_loop(mut player1: Player, mut maze: Maze)
      {
        exit(0);
      }   
-     if direction == 'u'
+     if direction == 'u'&& player1.x > 0
      {
        maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
        player1.x= player1.x -1;
@@ -98,7 +110,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
        maze.map[player1.x as usize][player1.y as usize] = 'U'; 
        display_maze(&maze);
      } 
-     else if direction == 'l'
+     else if direction == 'l'&& player1.y > 0
+
      {
        maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
        player1.y= player1.y -1;
@@ -106,7 +119,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
        maze.map[player1.x as usize][player1.y as usize] = 'U'; 
        display_maze(&maze);
      } 
-     else if direction == 'd'
+     else if direction == 'd'&& player1.x +1 < maze.map.len() as u64 -1
+
      {
        maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
        player1.x= player1.x +1;
@@ -114,7 +128,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
        maze.map[player1.x as usize][player1.y as usize] = 'U'; 
        display_maze(&maze);
      } 
-     else if direction == 'r'
+     else if direction == 'r'&& player1.y + 1 < maze.map[player1.x as usize].len()as u64
+
      {
        maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
        player1.y= player1.y +1;

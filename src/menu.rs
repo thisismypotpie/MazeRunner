@@ -4,10 +4,16 @@ use std::io::{stdin,stdout,Write};
 use std::process::exit;
 use crate::running_alg::load_maze;
 use crate::running_alg::begin_game;
+use crate::running_alg::generate_maze;
 
-fn create_random_maze()-> String{
-  print!("{}[2J", 27 as char);//Ref. 1
-  println!("Please select the size of your maze. The minimum is 10x10 with a max size of 120x120.  All you need to do is type a single number and the maze will be created in a x by x maze based on the number you typed in.  If you would like to go back, please type 'back'.");
+fn create_random_maze(message: String){
+  println!("{}", clear::All);//ref 6
+  println!("{}",message);
+  let title = ["Width","Height"];
+  let mut maze_info = Vec::new();
+  for t in title.iter()
+  {
+    println!("Please select the {} of your maze, minimum is 10, maximum is 1,000.",t);
     //Ref. 2 begin
     let mut s=String::new();
     let _=stdout().flush();
@@ -21,21 +27,47 @@ fn create_random_maze()-> String{
     //Ref. 2 end
     if s.to_lowercase() == "back"
     {
-      print!("{}[2J", 27 as char);//Ref. 1
-      return s;
+      println!("{}", clear::All);//ref 6
+      return ;
     }
     let _test = s.parse::<i32>();
      if _test.is_err(){
-	return create_random_maze();
+	return create_random_maze("Please enter only a number.".to_string());
     }
      let _num:i32 = s.parse().unwrap();
      if _num < 10 || _num > 1000{
-	return create_random_maze();
+	return create_random_maze("Please enter only numbers between 10 and 1000.".to_string());
     }
-    return s;
+    maze_info.push(s);
+  } 
+  println!("What would you like to name the maze?");  
+    //Ref. 2 begin
+    let mut s=String::new();
+    let _=stdout().flush();
+    stdin().read_line(&mut s).expect("Did not enter a correct string");
+    if let Some('\n')=s.chars().next_back() {
+        s.pop();
+    }
+    if let Some('\r')=s.chars().next_back() {
+        s.pop();
+    }
+    //Ref. 2 end
+    if s.to_lowercase() == "back"
+    {
+      println!("{}", clear::All);//ref 6
+      return;
+    }
+    else if s.to_lowercase() == ""
+    {
+      return create_random_maze("Your maze needs to have a name greater than zero characters.".to_string());
+    }
+    let strat = maze_solving_strategy();
+    generate_maze(maze_info,strat);
 }
 
 pub fn maze_solving_strategy()-> String{
+  
+  println!("{}", clear::All);//ref 6
   println!("Please select a strategy for solving the maze.\n 1. Right hand rule \n 2. Solve on my own.");
     //Ref. 2 begin
     let mut s=String::new();
@@ -56,8 +88,7 @@ pub fn maze_solving_strategy()-> String{
 }
 pub fn load_in_maze()-> String//If a 2 is returned from main menu, this function is called from main.
 { 
-  //print!("{}[2J", 27 as char);//Ref. 1
-  println!("{}", clear::All);
+  println!("{}", clear::All);//ref 6
   println!("What is the name of the file you are loading? Make sure that the maze you are loading is in the maze directory above src.  Type 'back to go back to main menu.'");
     //Ref. 2 begin
     let mut s=String::new();
@@ -88,18 +119,12 @@ pub fn main_menu(){
     }
     //Ref. 2 end
     if s == "1" {//create a random maze
-        let choice = create_random_maze();
-        if choice.to_lowercase() != "back"
-	{
-          maze_solving_strategy();
-	}	
+        create_random_maze("".to_string());
     }
     else if s == "2"{//load in a mze.
         let choice = load_in_maze();
         if choice.to_lowercase() != "back"
 	{
-          //maze_solving_strategy();
-          //load_maze(choice);
 	  begin_game(maze_solving_strategy(),load_maze(choice));
           exit(0);
 	}	
