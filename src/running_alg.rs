@@ -1,4 +1,5 @@
 extern crate termion;
+extern crate rand;
 use std::process::exit;
 use std::fs::File;
 use std::io::Read;
@@ -8,6 +9,8 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use std::io::{stdout,stdin,Write};
 use termion::clear;
+use rand::Rng;
+
   pub struct Player {
   pub x: u64,
   pub y: u64,
@@ -36,8 +39,67 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     }
     iter+= 1;
   }            
-}
+  let start_x = rand::thread_rng().gen_range(0,height);
+  let start_y = rand::thread_rng().gen_range(0,width);
+  let mut finish_x = start_x.clone();
+  let mut finish_y = start_y.clone(); 
+  while start_x == finish_x
+  {
+    finish_x = rand::thread_rng().gen_range(1,height);
+  }
+  while start_y == finish_y
+  {
+    finish_y = rand::thread_rng().gen_range(1,width);
+  }
+  maze[start_x as usize][start_y as usize] = 's';
+  maze[finish_x as usize][finish_y as usize] = 'f';
+    
+  let mut trailblazer = Player{x:start_x,y:start_y,strategy:strat.clone(),underfoot:'s'};
+  let mut direction_chosen = rand::thread_rng().gen_range(1,5);
+  let names = ["left","up","left","down"];
+  while maze[trailblazer.x as usize][trailblazer.y as usize]!='f'
+  {
+    println!("Trailblazer coordinates: {},{}",trailblazer.x,trailblazer.y); 
+    println!("Direction chosen: {}",names[direction_chosen as usize-1]); 
+    if direction_chosen == 1 && trailblazer.y > 1//left
+    {
+      trailblazer.y= trailblazer.y -1;
+      if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
+      {
+        maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
+      }
+    }
+    else if direction_chosen == 2 && trailblazer.x > 1//up
+    {
+      trailblazer.x= trailblazer.x -1;
+      if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
+      {
+        maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
+      }
 
+    }
+    else if direction_chosen == 3 && trailblazer.y < maze[trailblazer.x as usize].len()as u64 -2//right
+    {
+      trailblazer.y= trailblazer.y -1;
+      if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
+      {
+        maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
+      }
+   
+    }
+    else if direction_chosen == 4&& trailblazer.x +1 < maze.len() as u64 -2//down
+    {
+      trailblazer.x= trailblazer.x +1;
+      if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
+      {
+        maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
+      }
+
+    }
+    direction_chosen = rand::thread_rng().gen_range(1,5);
+  }
+  begin_game(strat,maze);
+}
 
 pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
   let p = env::current_dir().unwrap();//ref 3
