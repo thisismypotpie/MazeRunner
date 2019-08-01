@@ -288,18 +288,59 @@ fn get_input_direction()->char
 }
 //end reference 6
 
+fn find_range_values_to_display(maze: &Maze, player1: &Player, start: &i32, end: &i32)
+{
+  if *start < 0
+  {
+    *end += -(start);      
+    *start = 0;
+  }
+  else if *end > maze.map.len() as i32 -1
+  {
+    *start -= (end - maze.map.len()as i32 -1); 
+    *end = maze.map.len() as i32 -1;
+  }
+}
 pub fn display_maze(maze: &Maze, player1: &Player)
 {
-  
+  let vert_window:u64 = 20; 
+  let hor_window:u64 = 40;
+  let start_i:i32 = player1.x as i32 - vert_window as i32;
+  let end_i:i32 = player1.x as i32 + vert_window as i32;
+  let start_j:i32 = player1.y as i32 - hor_window as i32;
+  let end_j:i32 = player1.y as i32+ hor_window as i32;
+  find_range_values_to_display(&maze, &player1, &start_i, &end_i); 
+  find_range_values_to_display(&maze, &player1, &start_j, &end_j); 
   println!("{}",clear::All);
-  for i in 0..maze.map.len()
+  /*
+  if vert_window <= maze.map.len() as u64 && hor_window <= maze.map[0].len() as u64
   {
-    for j in 0..maze.map[i].len()
+    for i in 0..maze.map.len()
     {
-      print!("{}",maze.map[i][j].to_string());
+      for j in 0..maze.map[i].len()
+      {
+        print!("{}",maze.map[i][j].to_string());
+      }
+      println!();
     }
-    println!();
+    return
   }
+  else
+  {*/
+    println!("Stating location:{},{} ",player1.x,player1.y);
+    for i in start_i..end_i
+    {
+      for j in start_j..end_j
+      {
+        if(i>= 0 && j<=0 && i< maze.map.len()as i32 && j < maze.map[player1.x as usize].len()as i32 -1)
+	{
+	  print!("({}.{})",i,j);
+//          print!("{}",maze.map[i as usize][j as usize].to_string());
+	}
+	println!();
+      }
+    }
+  //}
 }
 
 fn find_maze_points(maze: &std::vec::Vec<(Vec<(char)>)>)->[u64;4]
