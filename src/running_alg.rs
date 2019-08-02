@@ -41,19 +41,8 @@ pub fn generate_maze(info: Vec<String>, strat: String)
   }            
   let start_x = rand::thread_rng().gen_range(0,height);
   let start_y = rand::thread_rng().gen_range(0,width);
-  let mut finish_x = start_x.clone();
-  let mut finish_y = start_y.clone(); 
-  while start_x == finish_x
-  {
-    finish_x = rand::thread_rng().gen_range(1,height);
-  }
-  while start_y == finish_y
-  {
-    finish_y = rand::thread_rng().gen_range(1,width);
-  }
   maze[start_x as usize][start_y as usize] = 's';
-  maze[finish_x as usize][finish_y as usize] = 'f';
-    
+/*    
   let mut trailblazer = Player{x:start_x,y:start_y,strategy:strat.clone(),underfoot:'s'};
   let mut direction_chosen = rand::thread_rng().gen_range(1,5);
   let names = ["left","up","right","down"];
@@ -114,6 +103,7 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     line_length = rand::thread_rng().gen_range(1,(maze.len()/12)) as u64;
   }
   maze[trailblazer.x as usize][trailblazer.y as usize] = 'f';
+  */
   begin_game(strat,maze);
 }
 
@@ -288,32 +278,54 @@ fn get_input_direction()->char
 }
 //end reference 6
 
-fn find_range_values_to_display(maze: &Maze, player1: &Player, start: &i32, end: &i32)
+fn find_range_values_to_display(maze: &Maze, player1: &Player, start: &mut i32, end: &mut i32)
 {
   if *start < 0
   {
-    *end += -(start);      
+    *end -= *start;      
     *start = 0;
   }
   else if *end > maze.map.len() as i32 -1
   {
-    *start -= (end - maze.map.len()as i32 -1); 
+    *start -= (*end  - maze.map.len()as i32 -1); 
     *end = maze.map.len() as i32 -1;
   }
 }
+fn shift_vertical_display()
+{
+  println!("Vertical shift");
+}
+
+fn shift_horizontal_display()
+{
+  println!("Horizontal shift");
+   /*
+    println!("Stating location:{},{} ",player1.x,player1.y);
+    for i in start_i..end_i
+    {
+      for j in start_j..end_j
+      {
+          print!("{}",maze.map[i as usize][j as usize].to_string());
+      }
+	println!();
+    }*/
+
+}
 pub fn display_maze(maze: &Maze, player1: &Player)
 {
-  let vert_window:u64 = 20; 
-  let hor_window:u64 = 40;
-  let start_i:i32 = player1.x as i32 - vert_window as i32;
-  let end_i:i32 = player1.x as i32 + vert_window as i32;
-  let start_j:i32 = player1.y as i32 - hor_window as i32;
-  let end_j:i32 = player1.y as i32+ hor_window as i32;
-  find_range_values_to_display(&maze, &player1, &start_i, &end_i); 
-  find_range_values_to_display(&maze, &player1, &start_j, &end_j); 
   println!("{}",clear::All);
-  /*
-  if vert_window <= maze.map.len() as u64 && hor_window <= maze.map[0].len() as u64
+  let vert_window:u64 = 10; 
+  let hor_window:u64 = 20;
+  let mut start_i:i32 = player1.x as i32 - vert_window as i32;
+  let mut end_i:i32 = player1.x as i32 + vert_window as i32;
+  let mut start_j:i32 = player1.y as i32 - hor_window as i32;
+  let mut end_j:i32 = player1.y as i32+ hor_window as i32;
+  println!("BEFORE: \n vert range: {} to {} \n hor range: {} to {}\n player location: {},{}",start_i,end_i,start_j,end_j,player1.x,player1.y);
+  find_range_values_to_display(&maze, &player1, &mut start_i, &mut end_i); 
+  find_range_values_to_display(&maze, &player1, &mut start_j, &mut end_j); 
+  println!("AFTER: \n vert range: {} to {} \n hor range: {} to {}\n player location: {},{}",start_i,end_i,start_j,end_j,player1.x,player1.y);
+  println!("Vert window: {} > {}  and hor window: {} > {}", 2*vert_window+1,maze.map.len(),2*hor_window+1,maze.map[0].len());
+  if 2*vert_window+1 > maze.map.len()as u64 -1 && 2*hor_window+1 > maze.map[0].len() as u64
   {
     for i in 0..maze.map.len()
     {
@@ -323,24 +335,16 @@ pub fn display_maze(maze: &Maze, player1: &Player)
       }
       println!();
     }
-    return
+    return;
   }
-  else
-  {*/
-    println!("Stating location:{},{} ",player1.x,player1.y);
-    for i in start_i..end_i
-    {
-      for j in start_j..end_j
-      {
-        if(i>= 0 && j<=0 && i< maze.map.len()as i32 && j < maze.map[player1.x as usize].len()as i32 -1)
-	{
-	  print!("({}.{})",i,j);
-//          print!("{}",maze.map[i as usize][j as usize].to_string());
-	}
-	println!();
-      }
-    }
-  //}
+  if 2*vert_window +1 =< maze.map.len() as u64 -1
+  {
+    shift_vertical_display();
+  }
+  if 2*hor_window +1 =< maze.map[0].len() as u64
+  {
+    shift_horizontal_display();
+  }
 }
 
 fn find_maze_points(maze: &std::vec::Vec<(Vec<(char)>)>)->[u64;4]
