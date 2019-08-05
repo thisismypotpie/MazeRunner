@@ -35,10 +35,23 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     maze.push(Vec::new());
     for i in 0..width
     {
-      maze[iter].push('x'); 
+	if s == height-1 || i == width-1 || s ==0 || i == 0
+	{
+          maze[iter].push('x');
+	}
+        else
+        {
+          maze[iter].push('_'); 
+        }
     }
     iter+= 1;
   }            
+  recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[1..height as usize-2][1..width as usize-2] )); 
+  let ran_x = rand::thread_rng().gen_range(0,maze.len()-2);
+  let ran_y = rand::thread_rng().gen_range(0,maze[0].len()-2);
+  maze[ran_x][ran_y]='s';
+  begin_game(strat,maze);
+  /*
   let start_x = rand::thread_rng().gen_range(0,height);
   let start_y = rand::thread_rng().gen_range(0,width);
   maze[start_x as usize][start_y as usize] = 's';    
@@ -54,69 +67,40 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     println!("Trailblazer coordinates: {},{}",trailblazer.x,trailblazer.y); 
     println!("Direction chosen: {}",names[direction_chosen as usize-1]); 
     println!("Length: {}",line_length);
-    if direction_chosen == 1 && trailblazer.y > moves +1//left
-    {
-      for j in 0..moves
-      {	
-        if trailblazer.y > 0
-        {
-          trailblazer.y= trailblazer.y -1;
-	}
-        if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
-        {
-          maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
-        }
-      }
-    }
-    else if direction_chosen == 2 && trailblazer.x > moves +1//up
-    {
-      for j in 0..moves
-      {
-	if trailblazer.x > 0
-	{
-          trailblazer.x= trailblazer.x -1;
-	}
-        if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
-        {
-          maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
-        }
-      }
-
-    }
-    else if direction_chosen == 3 && trailblazer.y+moves < maze[trailblazer.x as usize].len()as u64 -2//right
-    {
-      for j in 0..moves
-      {
-	if trailblazer.y < maze[trailblazer.x as usize].len() as u64 -2
-	{
-          trailblazer.y= trailblazer.y +1;
-	}
-        if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
-        {
-          maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
-        }
-      }
-   
-    }
-    else if direction_chosen == 4&& trailblazer.x +moves < maze.len() as u64 -2//down
-    {
-      for j in 0..moves
-      {
-	if trailblazer.x < maze[trailblazer.x  as usize].len() as u64 -2
-	{
-          trailblazer.x= trailblazer.x +1;
-	}
-        if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
-        {
-          maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
-        }
-      }
-    }
     direction_chosen = rand::thread_rng().gen_range(1,5);
     line_length = rand::thread_rng().gen_range(1,(maze.len()/10)) as u64;
   }
   maze[trailblazer.x as usize][trailblazer.y as usize] = 'f';
-  begin_game(strat,maze);
+  begin_game(strat,maze);*/
+}
+
+//The idea for this algorithm was found in reference 7.
+fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>)
+{
+  if maze.len()as u64 == 1 && maze[0].len() as u64 == 1
+  {
+    return;
+  }
+  let vert_wall = rand::thread_rng().gen_range(0,maze.len()-2);
+  let hor_wall = rand::thread_rng().gen_range(0,maze[0].len()-2);
+  let height = maze.len().clone();
+  let width = maze[0].len().clone();
+  for i in 0..maze.len()
+  {
+    maze[i][vert_wall] = 'x'; 
+  }
+  for i in 0..maze[0].len()
+  {
+    maze[hor_wall][i] = 'x';
+  }   
+  println!("Section one bounds: (0,{}),({},{})",vert_wall-1,vert_wall-1,hor_wall-1);
+  //println!("Section two bounds: ({},{}),({},{})",vert_wall+1,hor_wall-1,hor_wall-1,maze[0].len());
+  //println!("Section three bounds: ({},{}),({},{})",hor_wall+1,vert_wall-1,vert_wall-1,maze.len());
+  //println!("Section four bounds: ({},{}),({},{})",hor_wall+1,maze[0].len(),vert_wall+1,maze.len());
+  recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[0..hor_wall][0..vert_wall] ));
+  //recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[0..hor_wall][vert_wall..width] ));
+  //recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[hor_wall..height][0..vert_wall] ));
+  //recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[hor_wall..height][vert_wall..width] ));
 }
 
 pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
