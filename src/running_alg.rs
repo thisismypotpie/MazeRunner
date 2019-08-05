@@ -46,9 +46,11 @@ pub fn generate_maze(info: Vec<String>, strat: String)
   let mut direction_chosen = rand::thread_rng().gen_range(1,5);
   let names = ["left","up","right","down"];
   let mut line_length:u64 = rand::thread_rng().gen_range(1,(maze.len()/10))as u64;
-  let mut moves:u64 = rand::thread_rng().gen_range((maze.len()/10),(maze.len()/2)) as u64;
+  let moves:u64 = rand::thread_rng().gen_range((maze.len()/2),2*(maze.len()/3)) as u64;
+  println!("Moves: {}",moves);
   for i in 0..moves
   {
+    println!("moves_left: {}",moves -i);
     println!("Trailblazer coordinates: {},{}",trailblazer.x,trailblazer.y); 
     println!("Direction chosen: {}",names[direction_chosen as usize-1]); 
     println!("Length: {}",line_length);
@@ -56,7 +58,10 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     {
       for j in 0..moves
       {	
-        trailblazer.y= trailblazer.y -1;
+        if trailblazer.y > 0
+        {
+          trailblazer.y= trailblazer.y -1;
+	}
         if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
         {
           maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
@@ -67,7 +72,10 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     {
       for j in 0..moves
       {
-        trailblazer.x= trailblazer.x -1;
+	if trailblazer.x > 0
+	{
+          trailblazer.x= trailblazer.x -1;
+	}
         if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
         {
           maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
@@ -79,7 +87,10 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     {
       for j in 0..moves
       {
-        trailblazer.y= trailblazer.y +1;
+	if trailblazer.y < maze[trailblazer.x as usize].len() as u64 -2
+	{
+          trailblazer.y= trailblazer.y +1;
+	}
         if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
         {
           maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
@@ -91,7 +102,10 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     {
       for j in 0..moves
       {
-        trailblazer.x= trailblazer.x +1;
+	if trailblazer.x < maze[trailblazer.x  as usize].len() as u64 -2
+	{
+          trailblazer.x= trailblazer.x +1;
+	}
         if(maze[trailblazer.x as usize][trailblazer.y as usize]=='x')
         {
           maze[trailblazer.x as usize][trailblazer.y as usize] = '_';
@@ -99,7 +113,7 @@ pub fn generate_maze(info: Vec<String>, strat: String)
       }
     }
     direction_chosen = rand::thread_rng().gen_range(1,5);
-    line_length = rand::thread_rng().gen_range(1,(maze.len()/12)) as u64;
+    line_length = rand::thread_rng().gen_range(1,(maze.len()/10)) as u64;
   }
   maze[trailblazer.x as usize][trailblazer.y as usize] = 'f';
   begin_game(strat,maze);
@@ -150,10 +164,10 @@ pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
   maze.start_y = points[1];
   maze.finish_x = points[2];
   maze.finish_y = points[3]; 
-  print!("{}[2J", 27 as char);//Ref. 1
-  println!("Ready sarge!{}{}{}{}",points[0],points[1],points[2],points[3]);
+  println!("{}",clear::All);//ref 6
   maze.map[player1.x as usize][player1.y as usize]='U';
-  display_maze(&maze,&player1);
+  display_all_maze(&maze, &player1);
+  //display_maze(&maze,&player1);
   game_loop(player1,maze);
 }
 
@@ -181,7 +195,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.x= player1.x -1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          display_maze(&maze,&player1);
+          display_all_maze(&maze,&player1);
+          //display_maze(&maze,&player1);
 	}
      } 
      else if direction == 'l'&& player1.y > 0
@@ -199,7 +214,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.y= player1.y -1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          display_maze(&maze,&player1);
+          //display_maze(&maze,&player1);
+          display_all_maze(&maze,&player1);
 	}
      } 
      else if direction == 'd'&& player1.x +1 < maze.map.len() as u64 -1
@@ -217,7 +233,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.x= player1.x +1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          display_maze(&maze,&player1);
+          //display_maze(&maze,&player1);
+          display_all_maze(&maze,&player1);
 	}
      } 
      else if direction == 'r'&& player1.y + 1 < maze.map[player1.x as usize].len()as u64
@@ -235,7 +252,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.y= player1.y +1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          display_maze(&maze,&player1);
+          //display_maze(&maze,&player1);
+          display_all_maze(&maze,&player1);
 	}
      } 
      else
@@ -289,29 +307,22 @@ fn find_range_values_to_display(maze: &Maze, player1: &Player, start: &mut i32, 
     *end = maze.map.len() as i32 -1;
   }
 }
-fn shift_vertical_display()
+pub fn display_all_maze(maze: &Maze, player1: &Player)
 {
-  println!("Vertical shift");
-}
-
-fn shift_horizontal_display()
-{
-  println!("Horizontal shift");
-   /*
-    println!("Stating location:{},{} ",player1.x,player1.y);
-    for i in start_i..end_i
+    println!("Location:{},{} ",player1.x,player1.y);
+    for i in 0..maze.map.len()
     {
-      for j in start_j..end_j
+      for j in 0..maze.map[i].len()
       {
           print!("{}",maze.map[i as usize][j as usize].to_string());
       }
 	println!();
-    }*/
+    }
 
 }
 pub fn display_maze(maze: &Maze, player1: &Player)
 {
-  println!("{}",clear::All);
+  println!("{}",clear::All);//ref 6
   let vert_window:u64 = 10; 
   let hor_window:u64 = 20;
   let mut start_i:i32 = player1.x as i32 - vert_window as i32;
@@ -334,7 +345,7 @@ pub fn display_maze(maze: &Maze, player1: &Player)
   {
     end_j = maze.map.len() as i32-1;
   }
-    println!("Stating location:{},{} ",player1.x,player1.y);
+    println!("Location:{},{} ",player1.x,player1.y);
     for i in start_i..end_i
     {
       for j in start_j..end_j
@@ -343,32 +354,6 @@ pub fn display_maze(maze: &Maze, player1: &Player)
       }
 	println!();
     }
-  /*
-  println!("BEFORE: \n vert range: {} to {} \n hor range: {} to {}\n player location: {},{}",start_i,end_i,start_j,end_j,player1.x,player1.y);
-  find_range_values_to_display(&maze, &player1, &mut start_i, &mut end_i); 
-  find_range_values_to_display(&maze, &player1, &mut start_j, &mut end_j); 
-  println!("AFTER: \n vert range: {} to {} \n hor range: {} to {}\n player location: {},{}",start_i,end_i,start_j,end_j,player1.x,player1.y);
-  println!("Vert window: {} > {}  and hor window: {} > {}", 2*vert_window+1,maze.map.len(),2*hor_window+1,maze.map[0].len());
-  if 2*vert_window+1 > maze.map.len()as u64 -1 && 2*hor_window+1 > maze.map[0].len() as u64
-  {
-    for i in 0..maze.map.len()
-    {
-      for j in 0..maze.map[i].len()
-      {
-        print!("{}",maze.map[i][j].to_string());
-      }
-      println!();
-    }
-    return;
-  }
-  if 2*vert_window +1 <= maze.map.len() as u64 -1
-  {
-    shift_vertical_display();
-  }
-  if 2*hor_window +1 <= maze.map[0].len() as u64
-  {
-    shift_horizontal_display();
-  }*/
 }
 
 fn find_maze_points(maze: &std::vec::Vec<(Vec<(char)>)>)->[u64;4]

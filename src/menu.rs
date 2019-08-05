@@ -13,7 +13,7 @@ fn create_random_maze(message: String){
   let mut maze_info = Vec::new();
   for t in title.iter()
   {
-    println!("Please select the {} of your maze, minimum is 10, maximum is 1,000.",t);
+    println!("Please select the {} of your maze, minimum is 20, maximum is 1,000.",t);
     //Ref. 2 begin
     let mut s=String::new();
     let _=stdout().flush();
@@ -35,8 +35,8 @@ fn create_random_maze(message: String){
 	return create_random_maze("Please enter only a number.".to_string());
     }
      let _num:i32 = s.parse().unwrap();
-     if _num < 10 || _num > 1000{
-	return create_random_maze("Please enter only numbers between 10 and 1000.".to_string());
+     if _num < 20 || _num > 1000{
+	return create_random_maze("Please enter only numbers between 20 and 1000.".to_string());
     }
     maze_info.push(s);
   } 
