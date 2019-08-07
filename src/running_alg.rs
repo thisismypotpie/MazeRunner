@@ -47,7 +47,7 @@ pub fn generate_maze(info: Vec<String>, strat: String)
     iter+= 1;
   }            
   let endx:usize = maze.len() as usize -2;
-  let endy:usize = maze.len() as usize -2;
+  let endy:usize = maze[0].len() as usize -2;
   recursive_maze_creation(&mut maze,1 as usize,endx,1 as usize, endy);
 
   //recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[1..(height as usize-1)][1..(width as usize-1)] )); 
@@ -69,22 +69,25 @@ fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: u
     println!("Returning!");
     return;
   }
-  let vert_wall = rand::thread_rng().gen_range(xstart,xend);
-  let hor_wall = rand::thread_rng().gen_range(ystart,yend);
-  let height = maze.len().clone();
-  let width = maze[0].len().clone();
-  for i in xstart..xend
+    println!("maze index range: X: {}-{} Y:{}-{}",xstart,xend,ystart,yend);
+  let vert_wall = rand::thread_rng().gen_range(ystart,yend);
+  let hor_wall = rand::thread_rng().gen_range(xstart,xend);
+   println!("vert_wall: {}. Limit is: {}",vert_wall,yend);
+   println!("hor_wall: {}. Limit is: {}",hor_wall,xend);
+  for i in xstart..xend+1
   {
+    println!("i is {}",i);
+    //println!("x-index: {}",xstart+i);
     maze[i][vert_wall] = 'x'; 
   }
-  for i in ystart..yend
+  for i in ystart..yend+1
   {
+    println!("i is {}",i);
+    //println!("y-index: {}",ystart+i);
     maze[hor_wall][i] = 'x';
   } 
   
   let mut hole_punch = rand::thread_rng().gen_range(1,5);
-  let mut vert_hole = rand::thread_rng().gen_range(xstart,xend);    
-  let mut hor_hole = rand::thread_rng().gen_range(ystart,yend);    
   let mut sides_chosen = 0;
   let mut one_chosen = false;
   let mut two_chosen = false;
@@ -93,10 +96,13 @@ fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: u
  
   while sides_chosen < 3
   {
+    println!("hole punch chose: {}",hole_punch);
+    println!("sides chosen: {}",sides_chosen);
     //hole in vert wall before hor wall intersection.
     if hole_punch == 1 && one_chosen == false
     {
-      vert_hole = rand::thread_rng().gen_range(xstart,hor_wall);    
+      println!("Choosing Range between {} and {}.",xstart,hor_wall);
+      let mut vert_hole = rand::thread_rng().gen_range(xstart,hor_wall);    
       maze[vert_hole][vert_wall]= '_';
       one_chosen = true;
       sides_chosen+=1;
@@ -104,7 +110,8 @@ fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: u
     //hole in hor wall before vert wall intersection.
     else if hole_punch == 2 && two_chosen == false
     {
-      hor_hole = rand::thread_rng().gen_range(ystart,vert_wall);
+      println!("Choosing Range between {} and {}.",ystart,vert_wall);
+      let mut hor_hole = rand::thread_rng().gen_range(ystart,vert_wall);
       maze[hor_wall][hor_hole] = '_';
       two_chosen = true;
       sides_chosen+=1;
@@ -112,7 +119,8 @@ fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: u
     //hole in vert wall after hor wall intersection.
     else if hole_punch == 3 && three_chosen == false
     {
-      vert_hole = rand::thread_rng().gen_range(hor_wall+1,xend);
+      println!("Choosing Range between {} and {}.",hor_wall+1,xend);
+      let mut vert_hole = rand::thread_rng().gen_range(hor_wall+1,xend);
       maze[vert_hole][vert_wall]= '_';
       three_chosen = true;
       sides_chosen+=1;
@@ -120,41 +128,37 @@ fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: u
     //hole in hor wall after vert wall intersection.
     else if hole_punch == 4 && four_chosen == false
     {
-      hor_hole = rand::thread_rng().gen_range(vert_wall+1,yend);
+      println!("Choosing Range between {} and {}.",vert_wall+1,yend);
+      let mut hor_hole = rand::thread_rng().gen_range(vert_wall+1,yend);
       maze[hor_wall][hor_hole] = '_';
       four_chosen = true;
       sides_chosen+=1;
     }
+    hole_punch = rand::thread_rng().gen_range(1,5);
   } 
    
-    for i in xstart..xend
+    for i in xstart..xend+1
     {
-      for j in ystart..yend
+      for j in ystart..yend+1
       {
           print!("{}",maze[i as usize][j as usize].to_string());
       }
 	println!();
     }
-  println!("Section one bounds: (0,{}),(0,{})",hor_wall-1,vert_wall-1);
-  println!("Section two bounds: (0,{}),({},{})",hor_wall-1,vert_wall +1,yend);
-  println!("Section three bounds: ({},{}),(0,{})",hor_wall+1,xend,vert_wall-1);
-  println!("Section four bounds: ({},{}),({},{})",hor_wall+1,xend,vert_wall+1,yend);
-  let mut startx:usize = 0;
+  println!("Vert Wall: {}",vert_wall);
+  println!("Hor Wall: {}",hor_wall);
+  println!("Section one dimensions:   X:{}-{} Y:{}-{}",xstart,hor_wall-1,ystart,vert_wall-1);
+  println!("Section two dimensions:   X:{}-{} Y:{}-{}",xstart,hor_wall-1,vert_wall+1,yend);
+  println!("Section three dimensions: X:{}-{} Y:{}-{}",hor_wall+1,xend,ystart,vert_wall-1);
+  println!("Section four dimensions:  X:{}-{} Y:{}-{}",hor_wall+1,xend,vert_wall+1,yend);
+  let mut startx:usize = xstart;
   let mut endx:usize = hor_wall -1;
-  let mut starty:usize = 0;
+  let mut starty:usize = ystart;
   let mut endy:usize = vert_wall -1;
-  recursive_maze_creation(&mut maze,startx,endx,starty,endy);
-  starty = vert_wall +1;
-  endy = maze[0].len() -1;
-  recursive_maze_creation(&mut maze,startx,endx,starty,endy);
-  startx = hor_wall +1;
-  endx = maze.len() -1;
-  starty = 0;
-  endy = vert_wall -1;
-  recursive_maze_creation(&mut maze,startx,endx,starty,endy);
-  starty = vert_wall +1;
-  endy  = maze[0].len() -1;
-  recursive_maze_creation(&mut maze,startx,endx,starty,endy);
+  recursive_maze_creation(&mut maze,xstart,hor_wall -1,ystart,vert_wall-1);
+  recursive_maze_creation(&mut maze,xstart,hor_wall -1,vert_wall +1,yend);
+  recursive_maze_creation(&mut maze,hor_wall +1,xend,ystart,vert_wall -1);
+  recursive_maze_creation(&mut maze,hor_wall +1,xend,vert_wall+1, yend);
 }
 
 pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
