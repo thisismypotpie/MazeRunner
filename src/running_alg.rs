@@ -9,6 +9,7 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use std::io::{stdout,stdin,Write};
 use termion::clear;
+use termion::color;
 use rand::Rng;
 
   pub struct Player {
@@ -51,27 +52,27 @@ pub fn generate_maze(info: Vec<String>, strat: String)
   recursive_maze_creation(&mut maze,1 as usize,endx,1 as usize, endy);
 
   //recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[1..(height as usize-1)][1..(width as usize-1)] )); 
-  //let ran_x = rand::thread_rng().gen_range(0,maze.len()-2);
-  //let ran_y = rand::thread_rng().gen_range(0,maze[0].len()-2);
-  //maze[ran_x][ran_y]='s';
-  //begin_game(strat,maze);
+  let ran_x = rand::thread_rng().gen_range(0,maze.len()-2);
+  let ran_y = rand::thread_rng().gen_range(0,maze[0].len()-2);
+  maze[ran_x][ran_y]='s';
+  begin_game(strat,maze);
 }
 
 //The idea for this algorithm was found in reference 7.
 fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: usize, xend: usize, ystart: usize, yend: usize)
 {
-      let mut stdout = stdout();
+    /*  let mut stdout = stdout();
     stdout.write(b"Press Enter to continue...").unwrap();
     stdout.flush().unwrap();
-    stdin().read(&mut [0]).unwrap(); 
+    stdin().read(&mut [0]).unwrap(); */
   if xend - xstart <= 1 || yend - ystart <= 1
   {
     println!("Returning!");
     return;
   }
     println!("maze index range: X: {}-{} Y:{}-{}",xstart,xend,ystart,yend);
-  let vert_wall = rand::thread_rng().gen_range(ystart,yend);
-  let hor_wall = rand::thread_rng().gen_range(xstart,xend);
+  let vert_wall = rand::thread_rng().gen_range(ystart+1,yend);
+  let hor_wall = rand::thread_rng().gen_range(xstart+1,xend);
    println!("vert_wall: {}. Limit is: {}",vert_wall,yend);
    println!("hor_wall: {}. Limit is: {}",hor_wall,xend);
   for i in xstart..xend+1
@@ -120,7 +121,15 @@ fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: u
     else if hole_punch == 3 && three_chosen == false
     {
       println!("Choosing Range between {} and {}.",hor_wall+1,xend);
-      let mut vert_hole = rand::thread_rng().gen_range(hor_wall+1,xend);
+      let mut vert_hole = 0;
+      if hor_wall+1 == xend
+      {
+        vert_hole = hor_wall+1;
+      }
+      else
+      { 
+        vert_hole = rand::thread_rng().gen_range(hor_wall+1,xend);
+      }
       maze[vert_hole][vert_wall]= '_';
       three_chosen = true;
       sides_chosen+=1;
@@ -129,7 +138,15 @@ fn recursive_maze_creation(mut maze: &mut std::vec::Vec<(Vec<(char)>)>,xstart: u
     else if hole_punch == 4 && four_chosen == false
     {
       println!("Choosing Range between {} and {}.",vert_wall+1,yend);
-      let mut hor_hole = rand::thread_rng().gen_range(vert_wall+1,yend);
+      let mut hor_hole = 0;
+      if vert_wall+1 == yend
+      {
+	hor_hole = vert_wall+1;
+      }
+      else
+      {
+        hor_hole = rand::thread_rng().gen_range(vert_wall+1,yend);
+      }
       maze[hor_wall][hor_hole] = '_';
       four_chosen = true;
       sides_chosen+=1;
@@ -208,8 +225,8 @@ pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
   maze.finish_y = points[3]; 
   println!("{}",clear::All);//ref 6
   maze.map[player1.x as usize][player1.y as usize]='U';
-  display_all_maze(&maze, &player1);
-  //display_maze(&maze,&player1);
+  //display_all_maze(&maze, &player1);
+  display_maze(&maze,&player1);
   game_loop(player1,maze);
 }
 
@@ -222,6 +239,7 @@ fn game_loop(mut player1: Player, mut maze: Maze)
      direction = get_input_direction();
      if direction == 'e'
      {
+	    print!("{}",color::Fg(color::Reset));
        exit(0);
      }   
      if direction == 'u'&& player1.x > 0
@@ -237,8 +255,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.x= player1.x -1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          display_all_maze(&maze,&player1);
-          //display_maze(&maze,&player1);
+          //display_all_maze(&maze,&player1);
+          display_maze(&maze,&player1);
 	}
      } 
      else if direction == 'l'&& player1.y > 0
@@ -256,8 +274,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.y= player1.y -1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          //display_maze(&maze,&player1);
-          display_all_maze(&maze,&player1);
+          display_maze(&maze,&player1);
+          //display_all_maze(&maze,&player1);
 	}
      } 
      else if direction == 'd'&& player1.x +1 < maze.map.len() as u64 -1
@@ -275,8 +293,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.x= player1.x +1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          //display_maze(&maze,&player1);
-          display_all_maze(&maze,&player1);
+          display_maze(&maze,&player1);
+          //display_all_maze(&maze,&player1);
 	}
      } 
      else if direction == 'r'&& player1.y + 1 < maze.map[player1.x as usize].len()as u64
@@ -294,8 +312,8 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           player1.y= player1.y +1;
           player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
           maze.map[player1.x as usize][player1.y as usize] = 'U'; 
-          //display_maze(&maze,&player1);
-          display_all_maze(&maze,&player1);
+          display_maze(&maze,&player1);
+          //display_all_maze(&maze,&player1);
 	}
      } 
      else
@@ -383,16 +401,38 @@ pub fn display_maze(maze: &Maze, player1: &Player)
   {
     start_j = 0;
   }
-  if end_j >= maze.map.len() as i32
+  if end_j >= maze.map[0].len() as i32
   {
-    end_j = maze.map.len() as i32-1;
+    end_j = maze.map[0].len() as i32-1;
   }
     println!("Location:{},{} ",player1.x,player1.y);
     for i in start_i..end_i
     {
       for j in start_j..end_j
       {
-          print!("{}",maze.map[i as usize][j as usize].to_string());
+          /*let mut color = color::Fg(color::Reset);
+          if maze.map[i as usize][j as usize]=='_'
+          {
+            color = color::Fg(color::Green);
+          }
+          print!("{}",maze.map[i as usize][j as usize].to_string());*/
+	
+          if maze.map[i as usize][j as usize]=='_'
+          {
+	    print!("{}{}",color::Fg(color::Green),maze.map[i as usize][j as usize].to_string());
+          }
+          else if maze.map[i as usize][j as usize]=='U'
+          {
+	    print!("{}{}",color::Fg(color::Cyan),maze.map[i as usize][j as usize].to_string());
+          }
+          else if maze.map[i as usize][j as usize]=='f'
+          {
+	    print!("{}{}",color::Fg(color::LightYellow),maze.map[i as usize][j as usize].to_string());
+          }
+	  else
+	  {
+	    print!("{}{}",color::Fg(color::Reset),maze.map[i as usize][j as usize].to_string());
+	  }
       }
 	println!();
     }
