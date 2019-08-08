@@ -14,6 +14,7 @@ use rand::Rng;
 //use std::fs::Write;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use crate::menu::main_menu;
 
   pub struct Player {
   pub x: u64,
@@ -94,6 +95,13 @@ pub fn generate_maze(info: Vec<String>, name: String)
   ran_x = rand::thread_rng().gen_range(1,maze.len()-2);
   ran_y = rand::thread_rng().gen_range(1,maze[0].len()-2);
   maze[ran_x][ran_y]='f'; 
+  let wall_smashes = rand:: thread_rng().gen_range(maze.len()/10,maze.len()/4);
+  for i in 0..wall_smashes
+  {
+    ran_x = rand::thread_rng().gen_range(1,maze.len()-2);
+    ran_y = rand::thread_rng().gen_range(1,maze[0].len()-2);
+    maze[ran_x][ran_y]='v'; 
+  }
   save_maze_to_file(&mut maze,name);
   begin_game(maze);
 }
@@ -282,6 +290,11 @@ fn game_loop(mut player1: Player, mut maze: Maze)
 	    print!("{}",color::Fg(color::Reset));
        exit(0);
      }   
+     if direction == 'q'
+     {
+       println!("{}",clear::All);//ref 6
+       return main_menu();    
+     }
      if direction == 'u'&& player1.x > 0
      {
        if maze.map[player1.x as usize-1][player1.y as usize]=='x'
@@ -299,6 +312,12 @@ fn game_loop(mut player1: Player, mut maze: Maze)
 	  }
 	  continue;
 	}	
+        else if maze.map[player1.x as usize-1][player1.y as usize]=='v'
+	{
+	  player1.wall_smashes +=1;
+	  maze.map[player1.x as usize-1][player1.y as usize] = '_';
+          display_maze(&maze,&player1);        
+	}
 	else
 	{
           maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
@@ -328,6 +347,12 @@ fn game_loop(mut player1: Player, mut maze: Maze)
 	  continue;
 
 	}	
+        else if maze.map[player1.x as usize][player1.y as usize-1]=='v'
+	{
+	  player1.wall_smashes +=1;
+	  maze.map[player1.x as usize][player1.y as usize-1] = '_';
+          display_maze(&maze,&player1);        
+	}
 	else
 	{
           maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
@@ -356,6 +381,12 @@ fn game_loop(mut player1: Player, mut maze: Maze)
           }
 	  continue;
 	}	
+        else if maze.map[player1.x as usize+1][player1.y as usize]=='v'
+	{
+	  player1.wall_smashes +=1;
+	  maze.map[player1.x as usize+1][player1.y as usize] = '_';
+          display_maze(&maze,&player1);        
+	}
 	else
 	{
           maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
@@ -385,6 +416,12 @@ fn game_loop(mut player1: Player, mut maze: Maze)
 	  continue;
 
 	}	
+        else if maze.map[player1.x as usize][player1.y as usize+1]=='v'
+	{
+	  player1.wall_smashes +=1;
+	  maze.map[player1.x as usize][player1.y as usize+1] = '_';
+          display_maze(&maze,&player1);        
+	}
 	else
 	{
           maze.map[player1.x as usize][player1.y as usize] = player1.underfoot;
@@ -424,6 +461,7 @@ fn get_input_direction()->char
        Key::Char('s') => return 'd',
        Key::Char('d') => return 'r',
        Key::Ctrl(c) => return'e',
+       Key::Char('q') => return'q',
        _         => return 'x',
      }
   }
@@ -487,6 +525,7 @@ pub fn display_maze(maze: &Maze, player1: &Player)
     println!("Location:{},{} ",player1.x,player1.y);
     println!("Exit: {},{}",maze.finish_x,maze.finish_y);
     println!("Wall smashes: {}",player1.wall_smashes);
+    println!("Pres [q] to quit back to main menu.");
     for i in start_i..end_i
     {
       for j in start_j..end_j+1
@@ -513,6 +552,10 @@ pub fn display_maze(maze: &Maze, player1: &Player)
           else if maze.map[i as usize][j as usize]=='s'
           {
 	    print!("{}{}",color::Fg(color::LightYellow),maze.map[i as usize][j as usize].to_string());
+          }
+          else if maze.map[i as usize][j as usize]=='v'
+          {
+	    print!("{}{}",color::Fg(color::Magenta),maze.map[i as usize][j as usize].to_string());
           }
 	  else
 	  {
