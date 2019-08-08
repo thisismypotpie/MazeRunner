@@ -61,31 +61,9 @@ fn create_random_maze(message: String){
     {
       return create_random_maze("Your maze needs to have a name greater than zero characters.".to_string());
     }
-    let strat = maze_solving_strategy();
-    generate_maze(maze_info,strat);
+    generate_maze(maze_info,s);
 }
 
-pub fn maze_solving_strategy()-> String{
-  
-  println!("{}", clear::All);//ref 6
-  println!("Please select a strategy for solving the maze.\n 1. Right hand rule \n 2. Solve on my own.");
-    //Ref. 2 begin
-    let mut s=String::new();
-    let _=stdout().flush();
-    stdin().read_line(&mut s).expect("Did not enter a correct string");
-    if let Some('\n')=s.chars().next_back() {
-        s.pop();
-    }
-    if let Some('\r')=s.chars().next_back() {
-        s.pop();
-    }
-    //Ref. 2 end
-    if s != "1" && s != "2"
-    {
-      return maze_solving_strategy();
-    }
-    return s;  
-}
 pub fn load_in_maze()-> String//If a 2 is returned from main menu, this function is called from main.
 { 
   println!("{}", clear::All);//ref 6
@@ -125,7 +103,7 @@ pub fn main_menu(){
         let choice = load_in_maze();
         if choice.to_lowercase() != "back"
 	{
-	  begin_game(maze_solving_strategy(),load_maze(choice));
+	  begin_game(load_maze(choice));
           exit(0);
 	}	
     }

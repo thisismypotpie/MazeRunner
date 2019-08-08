@@ -11,11 +11,13 @@ use std::io::{stdout,stdin,Write};
 use termion::clear;
 use termion::color;
 use rand::Rng;
+//use std::fs::Write;
+use std::fs::OpenOptions;
+use std::io::prelude::*;
 
   pub struct Player {
   pub x: u64,
   pub y: u64,
-  pub strategy: String,
   pub underfoot: char,
   }
   pub struct Maze{
@@ -25,7 +27,38 @@ use rand::Rng;
   pub finish_y: u64,
   pub map: Vec<(Vec<(char)>)>,
   } 
-pub fn generate_maze(info: Vec<String>, strat: String)
+
+fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>,name: String)
+{
+  let p = env::current_dir().unwrap();//ref 3
+  let mut path = p.display().to_string();
+  println!("Current directory: {}",path);
+  let test = &path[path.len()-3..path.len()];
+  println!("About to test: {}",test);
+  if test != "src"
+  {
+    println!("Adding src to path");
+    path = path + "/src";
+    println!("New path {}",path);
+  } 
+  path = path + "/mazes/";
+  println!("Final path: {}",path);
+   //ref 3 start
+   let mut data:String = "".to_string();
+   //let mut f = File::create(path+&name).expect("Could not find mazes directory.");
+   let mut file = OpenOptions::new()
+	.write(true)
+	.append(true)
+	.open(path+&name)
+	.unwrap();
+   for i in 0..maze.len()
+   {
+     data = maze[i].clone().into_iter().collect();     
+     writeln!(file,"{}",data);
+   }
+   //ref 3 end
+}
+pub fn generate_maze(info: Vec<String>, name: String)
 {
   let mut maze = Vec::new();
   let mut iter = 0;
@@ -52,10 +85,14 @@ pub fn generate_maze(info: Vec<String>, strat: String)
   recursive_maze_creation(&mut maze,1 as usize,endx,1 as usize, endy);
 
   //recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[1..(height as usize-1)][1..(width as usize-1)] )); 
-  let ran_x = rand::thread_rng().gen_range(0,maze.len()-2);
-  let ran_y = rand::thread_rng().gen_range(0,maze[0].len()-2);
+  let mut ran_x = rand::thread_rng().gen_range(1,maze.len()-2);
+  let mut ran_y = rand::thread_rng().gen_range(1,maze[0].len()-2);
   maze[ran_x][ran_y]='s';
-  begin_game(strat,maze);
+  ran_x = rand::thread_rng().gen_range(1,maze.len()-2);
+  ran_y = rand::thread_rng().gen_range(1,maze[0].len()-2);
+  maze[ran_x][ran_y]='f'; 
+  save_maze_to_file(&mut maze,name);
+  begin_game(maze);
 }
 
 //The idea for this algorithm was found in reference 7.
@@ -212,9 +249,9 @@ pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
   maze
 }
 
-pub fn begin_game(strat: String, maize: Vec<(Vec<(char)>)>)
+pub fn begin_game(maize: Vec<(Vec<(char)>)>)
 { 
-  let mut player1 = Player{x:0,y:0,strategy:strat,underfoot:'s'};
+  let mut player1 = Player{x:0,y:0,underfoot:'s'};
   let mut maze = Maze{start_x:0,start_y:0,finish_x:0,finish_y:0,map:maize.clone()};
   let mut points = find_maze_points(&maze.map); 
   player1.x = points[0];
@@ -406,9 +443,10 @@ pub fn display_maze(maze: &Maze, player1: &Player)
     end_j = maze.map[0].len() as i32-1;
   }
     println!("Location:{},{} ",player1.x,player1.y);
+    println!("Exit: {},{}",maze.finish_x,maze.finish_y);
     for i in start_i..end_i
     {
-      for j in start_j..end_j
+      for j in start_j..end_j+1
       {
           /*let mut color = color::Fg(color::Reset);
           if maze.map[i as usize][j as usize]=='_'
@@ -429,6 +467,10 @@ pub fn display_maze(maze: &Maze, player1: &Player)
           {
 	    print!("{}{}",color::Fg(color::LightYellow),maze.map[i as usize][j as usize].to_string());
           }
+          else if maze.map[i as usize][j as usize]=='s'
+          {
+	    print!("{}{}",color::Fg(color::LightYellow),maze.map[i as usize][j as usize].to_string());
+          }
 	  else
 	  {
 	    print!("{}{}",color::Fg(color::Reset),maze.map[i as usize][j as usize].to_string());
@@ -436,6 +478,7 @@ pub fn display_maze(maze: &Maze, player1: &Player)
       }
 	println!();
     }
+	    print!("{}",color::Fg(color::Reset));
 }
 
 fn find_maze_points(maze: &std::vec::Vec<(Vec<(char)>)>)->[u64;4]
