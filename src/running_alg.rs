@@ -18,6 +18,7 @@ use std::io::prelude::*;
   pub struct Player {
   pub x: u64,
   pub y: u64,
+  pub wall_smashes: u64,
   pub underfoot: char,
   }
   pub struct Maze{
@@ -45,16 +46,18 @@ fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>,name: String)
   println!("Final path: {}",path);
    //ref 3 start
    let mut data:String = "".to_string();
-   //let mut f = File::create(path+&name).expect("Could not find mazes directory.");
-   let mut file = OpenOptions::new()
+   let mut f = File::create(path+&name).expect("Could not find mazes directory.");
+   /*let mut file = OpenOptions::new()
 	.write(true)
 	.append(true)
 	.open(path+&name)
-	.unwrap();
+	.unwrap();*/
    for i in 0..maze.len()
    {
-     data = maze[i].clone().into_iter().collect();     
-     writeln!(file,"{}",data);
+     data = maze[i].clone().into_iter().collect();
+     data += &"\n".to_string(); 
+     //writeln!(file,"{}",data);
+     f.write_all(data.as_bytes());
    }
    //ref 3 end
 }
@@ -251,7 +254,7 @@ pub fn load_maze(file_name: String)-> Vec<(Vec<(char)>)>{
 
 pub fn begin_game(maize: Vec<(Vec<(char)>)>)
 { 
-  let mut player1 = Player{x:0,y:0,underfoot:'s'};
+  let mut player1 = Player{x:0,y:0,wall_smashes:5,underfoot:'s'};
   let mut maze = Maze{start_x:0,start_y:0,finish_x:0,finish_y:0,map:maize.clone()};
   let mut points = find_maze_points(&maze.map); 
   player1.x = points[0];
@@ -283,7 +286,17 @@ fn game_loop(mut player1: Player, mut maze: Maze)
      {
        if maze.map[player1.x as usize-1][player1.y as usize]=='x'
 	{
-	  println!("You smack face first into a wall.");
+	  if player1.wall_smashes > 0
+	  {
+	    println!("You smash through the wall.");
+	    player1.wall_smashes -= 1;
+	    maze.map[player1.x as usize-1][player1.y as usize] = '_';
+            display_maze(&maze,&player1);
+	  }
+	  else
+	  {
+	    println!("You smack face first into a wall.");
+	  }
 	  continue;
 	}	
 	else
@@ -301,7 +314,17 @@ fn game_loop(mut player1: Player, mut maze: Maze)
      {
        if maze.map[player1.x as usize][player1.y as usize-1]=='x'
 	{
-	  println!("You smack face first into a wall.");
+	  if player1.wall_smashes > 0
+	  {
+	    println!("You smash through the wall.");
+	    player1.wall_smashes -= 1;
+	    maze.map[player1.x as usize][player1.y as usize-1] = '_';
+            display_maze(&maze,&player1);
+	  }
+	  else
+	  {
+	    println!("You smack face first into a wall.");
+	  }
 	  continue;
 
 	}	
@@ -320,9 +343,18 @@ fn game_loop(mut player1: Player, mut maze: Maze)
      {
        if maze.map[player1.x as usize+1][player1.y as usize]=='x'
 	{
-	  println!("You smack face first into a wall.");
+          if player1.wall_smashes > 0
+          {
+	    println!("You smash through the wall.");
+            player1.wall_smashes -= 1;
+            maze.map[player1.x as usize+1][player1.y as usize] = '_';
+            display_maze(&maze,&player1);
+          }
+	  else
+          {
+	    println!("You smack face first into a wall.");
+          }
 	  continue;
-
 	}	
 	else
 	{
@@ -339,7 +371,17 @@ fn game_loop(mut player1: Player, mut maze: Maze)
      {
        if maze.map[player1.x as usize][player1.y as usize+1]=='x'
 	{
-	  println!("You smack face first into a wall.");
+          if player1.wall_smashes > 0
+          {
+	    println!("You smash through the wall.");
+            player1.wall_smashes -= 1;
+            maze.map[player1.x as usize][player1.y as usize+1] = '_';
+            display_maze(&maze,&player1);
+          }
+	  else
+          {
+	    println!("You smack face first into a wall.");
+          }
 	  continue;
 
 	}	
@@ -444,6 +486,7 @@ pub fn display_maze(maze: &Maze, player1: &Player)
   }
     println!("Location:{},{} ",player1.x,player1.y);
     println!("Exit: {},{}",maze.finish_x,maze.finish_y);
+    println!("Wall smashes: {}",player1.wall_smashes);
     for i in start_i..end_i
     {
       for j in start_j..end_j+1
