@@ -68,9 +68,8 @@ fn create_random_maze(message: String) {
             "Your maze needs to have a name greater than zero characters.".to_string(),
         );
     }
-    if maze_info.len() < 2
-    {
-      println!("Error: Width or height had no input, returning to main menu.");
+    if maze_info.len() < 2 {
+        println!("Error: Width or height had no input, returning to main menu.");
         //start ref 8
         let mut stdout = stdout();
         stdout
@@ -79,7 +78,7 @@ fn create_random_maze(message: String) {
         stdout.flush().unwrap();
         stdin().read(&mut [0]).unwrap();
         //end ref 8
-       return main_menu(); 
+        return main_menu();
     }
     generate_maze(maze_info, s);
 }

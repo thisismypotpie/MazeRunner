@@ -189,6 +189,21 @@ pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
         }
         iter += 1;
     }
+    for s in 0..maze.len() - 1 {
+        if maze[0].len() != maze[s].len() {
+            println!("ERROR: Length of each line is not uniform, please edit maze to have uniform line length.  Returing to main menu.");
+            //start ref 8
+            let mut stdout = stdout();
+            stdout
+                .write(b"Press Enter to retrn to main menu...")
+                .unwrap();
+            stdout.flush().unwrap();
+            stdin().read(&mut [0]).unwrap();
+            //end ref 8
+            println!("{}", clear::All); //ref 6
+            main_menu();
+        }
+    }
     maze
 }
 
@@ -196,7 +211,7 @@ pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
     let mut player1 = Player {
         x: 0,
         y: 0,
-        wall_smashes: 5 + maize.len() as u64/100 + maize[0].len()as u64/100,
+        wall_smashes: 5 + maize.len() as u64 / 100 + maize[0].len() as u64 / 100,
         underfoot: 's',
     };
     let mut maze = Maze {
@@ -207,6 +222,23 @@ pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
         map: maize.clone(),
     };
     let points = find_maze_points(&maze.map);
+    if points[0] == maze.map.len() as u64 + 1
+        || points[1] == maze.map.len() as u64 + 1
+        || points[2] == maze.map.len() as u64 + 1
+        || points[3] == maze.map.len() as u64 + 1
+    {
+        println!("ERROR: Could not find starting and finish points.  Returing to main menu.");
+        //start ref 8
+        let mut stdout = stdout();
+        stdout
+            .write(b"Press Enter to retrn to main menu...")
+            .unwrap();
+        stdout.flush().unwrap();
+        stdin().read(&mut [0]).unwrap();
+        //end ref 8
+        println!("{}", clear::All); //ref 6
+        return main_menu();
+    }
     player1.x = points[0];
     player1.y = points[1];
     maze.start_x = points[0];

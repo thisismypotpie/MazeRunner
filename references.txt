@@ -1,6 +1,3 @@
-Referece 1:
-https://stackoverflow.com/questions/34837011/how-to-clear-terminal-screen-in-rust-after-new-line-is-printing/34837038
-
 Reference 2:
 https://users.rust-lang.org/t/how-to-get-user-input/5176/2 by user: jethrogb
 
@@ -13,3 +10,9 @@ https://www.youtube.com/watch?v=8M0QfLUDaaA   <- This video helped to clear some
 Reference 6:
 https://github.com/redox-os/termion
 http://ticki.github.io/blog/making-terminal-applications-in-rust-with-termion/
+
+Reference 7:(The idea to use a recursive algorithm to create a maze was found here.)
+https://en.wikipedia.org/wiki/Maze_generation_algorithm
+
+Reference 8:
+https://www.reddit.com/r/rust/comments/8tfyof/noob_question_pause/
