@@ -7,9 +7,14 @@ use std::process::exit;
 use termion::clear;
 use termion::color;
 
+/*
+PURPOSE: The function retrieves the player intput of the length, width, and name of a randomly generated maze.
+INPUT: A string called message that will print any invalid parameters or run into an error.
+OUTPUT: none 
+*/
 fn create_random_maze(message: String) {
     println!("{}", clear::All); //ref 6
-    println!("{}", message);
+    println!("{}",message);
     let title = ["Width", "Height"];
     let mut maze_info = Vec::new();
     for t in title.iter() {
@@ -83,6 +88,11 @@ fn create_random_maze(message: String) {
     generate_maze(maze_info, s);
 }
 
+/*
+PURPOSE: Grabs the name of the maze the player wants to load through player input.
+INPUT: none
+OUPUT: A string that contains the name of the maze the player input.
+*/
 pub fn load_in_maze() -> String {
     println!("{}", clear::All); //ref 6
     println!("What is the name of the file you are loading? Make sure that the maze you are loading is in the maze directory above src.  Type 'back to go back to main menu.'");
@@ -101,6 +111,13 @@ pub fn load_in_maze() -> String {
     //Ref. 2 end
     s.to_string()
 }
+
+
+/*
+PURPOSE:
+INPUT:
+OUPUT:
+*/
 pub fn main_menu() {
     println!("Welcome to the Maze Running Simulator. \n Please Choose from the following options: \n 1. Run Randomly Generated Maze \n 2. Load in Maze to Run \n 3. Help \n 4. Exit");
 
