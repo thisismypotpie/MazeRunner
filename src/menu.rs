@@ -31,7 +31,7 @@ fn create_random_maze(message: String) {
         //Ref. 2 end
         if s.to_lowercase() == "back" {
             println!("{}", clear::All); //ref 6
-            return;
+            return main_menu();
         }
         let _test = s.parse::<i32>();
         if _test.is_err() {
@@ -61,7 +61,7 @@ fn create_random_maze(message: String) {
     //Ref. 2 end
     if s.to_lowercase() == "back" {
         println!("{}", clear::All); //ref 6
-        return;
+        return main_menu();
     } else if s.to_lowercase() == "" {
         return create_random_maze(
             "Your maze needs to have a name greater than zero characters.".to_string(),
@@ -70,7 +70,7 @@ fn create_random_maze(message: String) {
     generate_maze(maze_info, s);
 }
 
-pub fn load_in_maze() -> String //If a 2 is returned from main menu, this function is called from main.
+pub fn load_in_maze() -> String
 {
     println!("{}", clear::All); //ref 6
     println!("What is the name of the file you are loading? Make sure that the maze you are loading is in the maze directory above src.  Type 'back to go back to main menu.'");
@@ -106,20 +106,21 @@ pub fn main_menu() {
     }
     //Ref. 2 end
     if s == "1" {
-        //create a random maze
         create_random_maze("".to_string());
     } else if s == "2" {
-        //load in a mze.
         let choice = load_in_maze();
         if choice.to_lowercase() != "back" {
             begin_game(load_maze(choice));
             exit(0);
         }
+        else
+	{
+	  main_menu();
+	}
     } else if s == "3" {
-        //help options
-        println!("Help coming soon...");
+        //println!("Help coming soon...");
+      println!("Welcome to the maze helper.  Here is a rundown of available features to get you started.\n In the main menu there are two main ways of play.  You can either: \n 1. Create a randomly generated maze to solve. \n 2. Load in a maze to solve.\n  If you decide to generate a maze you will be prompted to input a width and length of a maze");
     } else if s == "4" {
-        //exit
         println!("Bye-bye, come back soon!");
         exit(0);
     } else {

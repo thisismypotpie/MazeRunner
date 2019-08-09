@@ -11,7 +11,6 @@ use termion::color;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-//use std::fs::OpenOptions;
 use crate::menu::main_menu;
 
 pub struct Player {
@@ -31,28 +30,17 @@ pub struct Maze {
 fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) {
     let p = env::current_dir().unwrap(); //ref 3
     let mut path = p.display().to_string();
-    println!("Current directory: {}", path);
     let test = &path[path.len() - 3..path.len()];
-    println!("About to test: {}", test);
     if test != "src" {
-        println!("Adding src to path");
         path += "/src";
-        println!("New path {}", path);
     }
     path += "/mazes/";
-    println!("Final path: {}", path);
     //ref 3 start
     let mut data: String;
     let mut f = File::create(path + &name).expect("Could not find mazes directory.");
-    /*let mut file = OpenOptions::new()
-    .write(true)
-    .append(true)
-    .open(path+&name)
-    .unwrap();*/
     for i in 0..maze.len() {
         data = maze[i].clone().into_iter().collect();
         data += &"\n".to_string();
-        //writeln!(file,"{}",data);
         f.write_all(data.as_bytes()).expect("Could not save maze.");
     }
     //ref 3 end
@@ -75,9 +63,7 @@ pub fn generate_maze(info: Vec<String>, name: String) {
     }
     let endx: usize = maze.len() as usize - 2;
     let endy: usize = maze[0].len() as usize - 2;
-    recursive_maze_creation(&mut maze, 1 as usize, endx, 1 as usize, endy);
-
-    //recursive_maze_creation(&mut std::vec::Vec::from(&mut maze[1..(height as usize-1)][1..(width as usize-1)] ));
+    recursive_maze_creation(&mut maze, 1 as usize, endx, 1 as usize, endy,0);
     let mut ran_x = rand::thread_rng().gen_range(1, maze.len() - 2);
     let mut ran_y = rand::thread_rng().gen_range(1, maze[0].len() - 2);
     maze[ran_x][ran_y] = 's';
@@ -101,31 +87,31 @@ fn recursive_maze_creation(
     xend: usize,
     ystart: usize,
     yend: usize,
+    mut dot:  usize,
 ) {
-    /*  let mut stdout = stdout();
-    stdout.write(b"Press Enter to continue...").unwrap();
-    stdout.flush().unwrap();
-    stdin().read(&mut [0]).unwrap(); */
+    if dot >=100
+    {
+      println!("{}", clear::All); //ref 6
+      print!("Loading");
+      dot = 0;
+    }
+    else
+    {
+      if dot == 20
+      {
+	print!(".");
+      }
+      dot+=1;
+    }
     if xend - xstart <= 1 || yend - ystart <= 1 {
-        println!("Returning!");
         return;
     }
-    println!(
-        "maze index range: X: {}-{} Y:{}-{}",
-        xstart, xend, ystart, yend
-    );
     let vert_wall = rand::thread_rng().gen_range(ystart + 1, yend);
     let hor_wall = rand::thread_rng().gen_range(xstart + 1, xend);
-    println!("vert_wall: {}. Limit is: {}", vert_wall, yend);
-    println!("hor_wall: {}. Limit is: {}", hor_wall, xend);
     for i in xstart..=xend {
-        println!("i is {}", i);
-        //println!("x-index: {}",xstart+i);
         maze[i][vert_wall] = 'x';
     }
     for i in ystart..=yend {
-        println!("i is {}", i);
-        //println!("y-index: {}",ystart+i);
         maze[hor_wall][i] = 'x';
     }
 
@@ -137,11 +123,8 @@ fn recursive_maze_creation(
     let mut four_chosen = false;
 
     while sides_chosen < 3 {
-        println!("hole punch chose: {}", hole_punch);
-        println!("sides chosen: {}", sides_chosen);
         //hole in vert wall before hor wall intersection.
         if hole_punch == 1 && !one_chosen {
-            println!("Choosing Range between {} and {}.", xstart, hor_wall);
             let vert_hole = rand::thread_rng().gen_range(xstart, hor_wall);
             maze[vert_hole][vert_wall] = '_';
             one_chosen = true;
@@ -149,7 +132,6 @@ fn recursive_maze_creation(
         }
         //hole in hor wall before vert wall intersection.
         else if hole_punch == 2 && !two_chosen {
-            println!("Choosing Range between {} and {}.", ystart, vert_wall);
             let hor_hole = rand::thread_rng().gen_range(ystart, vert_wall);
             maze[hor_wall][hor_hole] = '_';
             two_chosen = true;
@@ -157,7 +139,6 @@ fn recursive_maze_creation(
         }
         //hole in vert wall after hor wall intersection.
         else if hole_punch == 3 && !three_chosen {
-            println!("Choosing Range between {} and {}.", hor_wall + 1, xend);
             let vert_hole;
             if hor_wall + 1 == xend {
                 vert_hole = hor_wall + 1;
@@ -170,7 +151,6 @@ fn recursive_maze_creation(
         }
         //hole in hor wall after vert wall intersection.
         else if hole_punch == 4 && !four_chosen {
-            println!("Choosing Range between {} and {}.", vert_wall + 1, yend);
             let hor_hole;
             if vert_wall + 1 == yend {
                 hor_hole = vert_wall + 1;
@@ -183,66 +163,20 @@ fn recursive_maze_creation(
         }
         hole_punch = rand::thread_rng().gen_range(1, 5);
     }
-
-    for i in xstart..=xend {
-        for j in ystart..=yend {
-            print!("{}", maze[i as usize][j as usize].to_string());
-        }
-        println!();
-    }
-    println!("Vert Wall: {}", vert_wall);
-    println!("Hor Wall: {}", hor_wall);
-    println!(
-        "Section one dimensions:   X:{}-{} Y:{}-{}",
-        xstart,
-        hor_wall - 1,
-        ystart,
-        vert_wall - 1
-    );
-    println!(
-        "Section two dimensions:   X:{}-{} Y:{}-{}",
-        xstart,
-        hor_wall - 1,
-        vert_wall + 1,
-        yend
-    );
-    println!(
-        "Section three dimensions: X:{}-{} Y:{}-{}",
-        hor_wall + 1,
-        xend,
-        ystart,
-        vert_wall - 1
-    );
-    println!(
-        "Section four dimensions:  X:{}-{} Y:{}-{}",
-        hor_wall + 1,
-        xend,
-        vert_wall + 1,
-        yend
-    );
-    /*let mut startx:usize = xstart;
-    let mut endx:usize = hor_wall -1;
-    let mut starty:usize = ystart;
-    let  endy:usize = vert_wall -1;*/
-    recursive_maze_creation(&mut maze, xstart, hor_wall - 1, ystart, vert_wall - 1);
-    recursive_maze_creation(&mut maze, xstart, hor_wall - 1, vert_wall + 1, yend);
-    recursive_maze_creation(&mut maze, hor_wall + 1, xend, ystart, vert_wall - 1);
-    recursive_maze_creation(&mut maze, hor_wall + 1, xend, vert_wall + 1, yend);
+    recursive_maze_creation(&mut maze, xstart, hor_wall - 1, ystart, vert_wall - 1,dot);
+    recursive_maze_creation(&mut maze, xstart, hor_wall - 1, vert_wall + 1, yend,dot);
+    recursive_maze_creation(&mut maze, hor_wall + 1, xend, ystart, vert_wall - 1,dot);
+    recursive_maze_creation(&mut maze, hor_wall + 1, xend, vert_wall + 1, yend,dot);
 }
 
 pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
     let p = env::current_dir().unwrap(); //ref 3
     let mut path = p.display().to_string();
-    println!("Current directory: {}", path);
     let test = &path[path.len() - 3..path.len()];
-    println!("About to test: {}", test);
     if test != "src" {
-        println!("Adding src to path");
         path += "/src";
-        println!("New path {}", path);
     }
     path = path + "/mazes/" + &file_name;
-    println!("Final path: {}", path);
     //start ref 3
     let mut data = String::new();
     let mut file = File::open(path).expect("Could not find directory 'mazes'");
@@ -285,7 +219,6 @@ pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
     maze.finish_y = points[3];
     println!("{}", clear::All); //ref 6
     maze.map[player1.x as usize][player1.y as usize] = 'U';
-    //display_all_maze(&maze, &player1);
     display_maze(&maze, &player1);
     game_loop(player1, maze);
 }
@@ -322,7 +255,6 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
                 player1.x -= 1;
                 player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
                 maze.map[player1.x as usize][player1.y as usize] = 'U';
-                //display_all_maze(&maze,&player1);
                 display_maze(&maze, &player1);
             }
         } else if direction == 'l' && player1.y > 0 {
@@ -346,7 +278,6 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
                 player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
                 maze.map[player1.x as usize][player1.y as usize] = 'U';
                 display_maze(&maze, &player1);
-                //display_all_maze(&maze,&player1);
             }
         } else if direction == 'd' && player1.x + 1 < maze.map.len() as u64 - 1 {
             if maze.map[player1.x as usize + 1][player1.y as usize] == 'x' {
@@ -369,7 +300,6 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
                 player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
                 maze.map[player1.x as usize][player1.y as usize] = 'U';
                 display_maze(&maze, &player1);
-                //display_all_maze(&maze,&player1);
             }
         } else if direction == 'r' && player1.y + 1 < maze.map[player1.x as usize].len() as u64 {
             if maze.map[player1.x as usize][player1.y as usize + 1] == 'x' {
@@ -392,7 +322,6 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
                 player1.underfoot = maze.map[player1.x as usize][player1.y as usize];
                 maze.map[player1.x as usize][player1.y as usize] = 'U';
                 display_maze(&maze, &player1);
-                //display_all_maze(&maze,&player1);
             }
         } else {
             println!("You cannot go that way!");
@@ -406,7 +335,6 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
 //beign reference 6
 fn get_input_direction() -> char {
     let stdin = stdin();
-    //println!("Press any key to continue...");
     let mut stdout = stdout().into_raw_mode().unwrap();
     stdout.flush().unwrap();
     for c in stdin.keys() {
@@ -430,32 +358,6 @@ fn get_input_direction() -> char {
 }
 //end reference 6
 
-/*fn find_range_values_to_display(maze: &Maze, player1: &Player, start: &mut i32, end: &mut i32)
-{
-  if *start < 0
-  {
-    *end -= *start;
-    *start = 0;
-  }
-  else if *end > maze.map.len() as i32 -1
-  {
-    *start -= *end  - maze.map.len()as i32 -1;
-    *end = maze.map.len() as i32 -1;
-  }
-}*/
-/*pub fn display_all_maze(maze: &Maze, player1: &Player)
-{
-    println!("Location:{},{} ",player1.x,player1.y);
-    for i in 0..maze.map.len()
-    {
-      for j in 0..maze.map[i].len()
-      {
-          print!("{}",maze.map[i as usize][j as usize].to_string());
-      }
-    println!();
-    }
-
-}*/
 pub fn display_maze(maze: &Maze, player1: &Player) {
     println!("{}", clear::All); //ref 6
     let vert_window: u64 = 10;
@@ -481,14 +383,7 @@ pub fn display_maze(maze: &Maze, player1: &Player) {
     println!("Wall smashes: {}", player1.wall_smashes);
     println!("Pres [q] to quit back to main menu.");
     for i in start_i..end_i {
-        // for j in start_j..end_j+1
         for j in start_j..=end_j {
-            /*let mut color = color::Fg(color::Reset);
-            if maze.map[i as usize][j as usize]=='_'
-            {
-              color = color::Fg(color::Green);
-            }
-            print!("{}",maze.map[i as usize][j as usize].to_string());*/
 
             if maze.map[i as usize][j as usize] == '_' {
                 print!(
@@ -530,7 +425,6 @@ pub fn display_maze(maze: &Maze, player1: &Player) {
 }
 
 fn find_maze_points(maze: &[Vec<(char)>]) -> [u64; 4]
-//fn find_maze_points(maze: &Vec<(Vec<(char)>)>)->[u64;4]
 {
     let mut coordinates: [u64; 4] = [
         (maze.len() + 1) as u64,
