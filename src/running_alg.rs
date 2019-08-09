@@ -12,13 +12,22 @@ use termion::color;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-
+/*
+PURPOSE: A struct that holds information regarding the player of the maze runner.
+INPUT: none
+OUTPUT: none
+*/
 pub struct Player {
     pub x: u64,
     pub y: u64,
     pub wall_smashes: u64,
     pub underfoot: char,
 }
+/*
+PURPOSE: A struct that holds all information regarding the maze.
+INPUT: none
+OUTPUT: none
+*/
 pub struct Maze {
     pub start_x: u64,
     pub start_y: u64,
@@ -27,6 +36,11 @@ pub struct Maze {
     pub map: Vec<(Vec<(char)>)>,
 }
 
+/*
+PURPOSE: When a maze is randomly generated, this function will save that maze to the mazes directory so a player may replay any maze they had generated.
+INPUT: A 2D vec of chars and a string that is the name of the maze.
+OUTPUT: none
+*/
 fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) {
     let p = env::current_dir().unwrap(); //ref 3
     let mut path = p.display().to_string();
@@ -45,6 +59,11 @@ fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) {
     }
     //ref 3 end
 }
+/*
+PURPOSE: This function will generate the randomly generated maze to the player's specifications.
+INPUT: a vec with the width and height of the maze, and the name of the maze as a string.
+OUTPUT: none
+*/
 pub fn generate_maze(info: Vec<String>, name: String) {
     let mut maze = Vec::new();
     let mut iter = 0;
@@ -61,6 +80,7 @@ pub fn generate_maze(info: Vec<String>, name: String) {
         }
         iter += 1;
     }
+    //The following block of code generates random location for the start, end, and wall smashes within the maze.
     let endx: usize = maze.len() as usize - 2;
     let endy: usize = maze[0].len() as usize - 2;
     recursive_maze_creation(&mut maze, 1 as usize, endx, 1 as usize, endy, 0);
@@ -80,6 +100,11 @@ pub fn generate_maze(info: Vec<String>, name: String) {
     begin_game(maze);
 }
 
+/*
+PURPOSE: This function triggers the algorithm that will create the maze.  It does this by making two bisecting lines, opening a hole in three of the four resulting chambers and then repeating the process until the maze is complete.
+INPUT: A 2D vec of chars(the maze), the vertical start and end points of a chamber (xstart and xend), the horizontal start and end points of a chamber (ystart and yend), and a usice that lets the loading message know how many dots to add to the end of the loading message.  The loading message is used in the event that maze generation takes a while.
+OUTPUT: none
+*/
 //The idea for this algorithm was found in reference 7.
 fn recursive_maze_creation(
     mut maze: &mut std::vec::Vec<(Vec<(char)>)>,
@@ -159,12 +184,17 @@ fn recursive_maze_creation(
         }
         hole_punch = rand::thread_rng().gen_range(1, 5);
     }
+    //Recursively call the same function for each chamber created by the bisecting lines.
     recursive_maze_creation(&mut maze, xstart, hor_wall - 1, ystart, vert_wall - 1, dot);
     recursive_maze_creation(&mut maze, xstart, hor_wall - 1, vert_wall + 1, yend, dot);
     recursive_maze_creation(&mut maze, hor_wall + 1, xend, ystart, vert_wall - 1, dot);
     recursive_maze_creation(&mut maze, hor_wall + 1, xend, vert_wall + 1, yend, dot);
 }
-
+/*
+PURPOSE: Load in a maze if the player choosese to load in a maze file.
+INPUT: The name of the file to load.
+OUTPUT: A 2D vec of chars (the maze).
+*/
 pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
     let p = env::current_dir().unwrap(); //ref 3
     let mut path = p.display().to_string();
@@ -189,6 +219,7 @@ pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
         }
         iter += 1;
     }
+    //This loop tests if any loaded maze if rectangular and returns an error if not.
     for s in 0..maze.len() - 1 {
         if maze[0].len() != maze[s].len() {
             println!("ERROR: Length of each line is not uniform, please edit maze to have uniform line length.  Returing to main menu.");
@@ -206,7 +237,11 @@ pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
     }
     maze
 }
-
+/*
+PURPOSE:This function sets up the player into the maze, sets the finish points, and begins the game loop.
+INPUT: A 2D vec of chars
+OUTPUT: none
+*/
 pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
     let mut player1 = Player {
         x: 0,
@@ -222,6 +257,7 @@ pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
         map: maize.clone(),
     };
     let points = find_maze_points(&maze.map);
+    //This if statement check to see if there is data on the start and end points of the maze.  The default value for the points was maze.map.len()+1 and the if statement checks to see if any of the points have not been changed.  The points are the coordinates of the start and end point of the maze.
     if points[0] == maze.map.len() as u64 + 1
         || points[1] == maze.map.len() as u64 + 1
         || points[2] == maze.map.len() as u64 + 1
@@ -250,19 +286,26 @@ pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
     display_maze(&maze, &player1);
     game_loop(player1, maze);
 }
-
+/*
+PURPOSE: The main loop of the game, it continues to loop until the player quits or finishes the maze.
+INPUT: A player struct and a maze struct.
+OUTPUT: none
+*/
 fn game_loop(mut player1: Player, mut maze: Maze) {
     let mut direction;
+    //The game loop will continue until the player overlaps with the finish character.
     while player1.underfoot != 'f' {
         direction = get_input_direction();
         if direction == 'e' {
             print!("{}", color::Fg(color::Reset));
             exit(0);
         }
+        //If the player enters a 'q', return player to main menu.
         if direction == 'q' {
             println!("{}", clear::All); //ref 6
             return main_menu();
         }
+        //The player decides to go up.  The statment will check to make sure that the walk attempt ends in walkable land.
         if direction == 'u' && player1.x > 0 {
             if maze.map[player1.x as usize - 1][player1.y as usize] == 'x' {
                 if player1.wall_smashes > 0 {
@@ -285,6 +328,7 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
                 maze.map[player1.x as usize][player1.y as usize] = 'U';
                 display_maze(&maze, &player1);
             }
+        //The player decides to go left.  The statment will check to make sure that the walk attempt ends in walkable land.
         } else if direction == 'l' && player1.y > 0 {
             if maze.map[player1.x as usize][player1.y as usize - 1] == 'x' {
                 if player1.wall_smashes > 0 {
@@ -307,6 +351,7 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
                 maze.map[player1.x as usize][player1.y as usize] = 'U';
                 display_maze(&maze, &player1);
             }
+        //The player decides to go down.  The statment will check to make sure that the walk attempt ends in walkable land.
         } else if direction == 'd' && player1.x + 1 < maze.map.len() as u64 - 1 {
             if maze.map[player1.x as usize + 1][player1.y as usize] == 'x' {
                 if player1.wall_smashes > 0 {
@@ -329,6 +374,7 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
                 maze.map[player1.x as usize][player1.y as usize] = 'U';
                 display_maze(&maze, &player1);
             }
+        //The player decides to go right.  The statment will check to make sure that the walk attempt ends in walkable land.
         } else if direction == 'r' && player1.y + 1 < maze.map[player1.x as usize].len() as u64 {
             if maze.map[player1.x as usize][player1.y as usize + 1] == 'x' {
                 if player1.wall_smashes > 0 {
@@ -364,6 +410,11 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
     main_menu();
 }
 
+/*
+PURPOSE: Reads player input and then returns a char code to tell the game loop what kind of input it is dealing with.
+INPUT: none
+OUTPUT: a single char.
+*/
 //beign reference 6
 fn get_input_direction() -> char {
     let stdin = stdin();
@@ -390,6 +441,11 @@ fn get_input_direction() -> char {
 }
 //end reference 6
 
+/*
+PURPOSE: After each move the player makes, the commandl line is cleared and an updated maze is displayed.
+INPUT: a maze struct and a player struct.
+OUTPUT: none
+*/
 pub fn display_maze(maze: &Maze, player1: &Player) {
     println!("{}", clear::All); //ref 6
     let vert_window: u64 = 10;
@@ -455,6 +511,11 @@ pub fn display_maze(maze: &Maze, player1: &Player) {
     print!("{}", color::Fg(color::Reset));
 }
 
+/*
+PURPOSE: Finds the start and finish points of the maze to populate the player and maze struct at the beginning of the game.
+INPUT: a 2d Vec of chars (the maze).
+OUTPUT: a 4-element array that contains the coordinates for the start and finish point of a maze.
+*/
 fn find_maze_points(maze: &[Vec<(char)>]) -> [u64; 4] {
     let mut coordinates: [u64; 4] = [
         (maze.len() + 1) as u64,

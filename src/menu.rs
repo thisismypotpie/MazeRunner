@@ -10,13 +10,14 @@ use termion::color;
 /*
 PURPOSE: The function retrieves the player intput of the length, width, and name of a randomly generated maze.
 INPUT: A string called message that will print any invalid parameters or run into an error.
-OUTPUT: none 
+OUTPUT: none
 */
 fn create_random_maze(message: String) {
     println!("{}", clear::All); //ref 6
-    println!("{}",message);
+    println!("{}", message);
     let title = ["Width", "Height"];
     let mut maze_info = Vec::new();
+    //This loop will get the width of the maze from the player.
     for t in title.iter() {
         println!(
             "Please select the {} of your maze, minimum is 20, maximum is 1,000. Type 'back' to go back.",
@@ -35,6 +36,7 @@ fn create_random_maze(message: String) {
             s.pop();
         }
         //Ref. 2 end
+        //If at any time the player enters the word "back" the player is taken back to the main menu.
         if s.to_lowercase() == "back" {
             println!("{}", clear::All); //ref 6
             return main_menu();
@@ -112,11 +114,10 @@ pub fn load_in_maze() -> String {
     s.to_string()
 }
 
-
 /*
-PURPOSE:
-INPUT:
-OUPUT:
+PURPOSE: Allows the player to choose which kind of maze option they would like.
+INPUT: none
+OUPUT: none
 */
 pub fn main_menu() {
     println!("Welcome to the Maze Running Simulator. \n Please Choose from the following options: \n 1. Run Randomly Generated Maze \n 2. Load in Maze to Run \n 3. Help \n 4. Exit");
@@ -134,9 +135,12 @@ pub fn main_menu() {
         s.pop();
     }
     //Ref. 2 end
+    //Entering a one will beign the player input screen for generating a maze.
     if s == "1" {
         create_random_maze("".to_string());
-    } else if s == "2" {
+    }
+    //Entering a two will begin the maze loading screen.
+    else if s == "2" {
         let choice = load_in_maze();
         if choice.to_lowercase() != "back" {
             begin_game(load_maze(choice));
@@ -144,7 +148,9 @@ pub fn main_menu() {
         } else {
             main_menu();
         }
-    } else if s == "3" {
+    }
+    //Entering a three will display the help tutorial menu.
+    else if s == "3" {
         println!("{}", clear::All); //ref 6
         println!("Welcome to the maze helper.  Here is a rundown of available features to get you started.\nIn the main menu there are two main ways of play.  You can either: \n 1. Create a randomly generated maze to solve. \n 2. Load in a maze to solve.\nIf you decide to generate a maze you will be prompted to input a width and length of a maze as well as a name.  Whatever maze is generated will ba saved to your maze folder and can be loaded from the main menu.\n\nWhen you play the game, there are a few characters to be aware of: \n");
         println!(
@@ -185,7 +191,9 @@ pub fn main_menu() {
         //end ref 8
         println!("{}", clear::All); //ref 6
         main_menu();
-    } else if s == "4" {
+    }
+    //Entering a four will exit the program.
+    else if s == "4" {
         println!("{}", clear::All); //ref 6
         println!("Bye-bye, come back soon!");
         exit(0);

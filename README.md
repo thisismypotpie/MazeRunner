@@ -37,3 +37,10 @@ The user is also allows to go into mazes and create their own maze.  There are r
 
 
 Those are all of the basics needed to get started with this game.  Have fun and dont get lost in the mazes!
+
+
+ONE FINAL NOTE:
+As you run clippy you will notice that there are errors and warnings that appear.  In the proces of cleaning up this project, I gave each and every error 45 minutes to solve.  In many ccases the warning or error could be solved however there were some errors and warning in which their advice ending up making larger errors which I could not solve.  If I could not solve the warning in 45 mimnutes, I moved on to the next one.  Here are the following statisitcs from clippy when I started vs when I finished:
+errors: 19/25 errors solved.
+warnings: 34/37 errors solved.
+
