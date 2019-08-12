@@ -16,7 +16,7 @@ use termion::raw::IntoRawMode;
 PURPOSE: A struct that holds information regarding the player of the maze runner.
 INPUT: none
 OUTPUT: none
-*/
+ */
 pub struct Player {
     pub x: u64,
     pub y: u64,
@@ -27,7 +27,7 @@ pub struct Player {
 PURPOSE: A struct that holds all information regarding the maze.
 INPUT: none
 OUTPUT: none
-*/
+ */
 pub struct Maze {
     pub start_x: u64,
     pub start_y: u64,
@@ -39,16 +39,20 @@ pub struct Maze {
 /*
 PURPOSE: When a maze is randomly generated, this function will save that maze to the mazes directory so a player may replay any maze they had generated.
 INPUT: A 2D vec of chars and a string that is the name of the maze.
-OUTPUT: none
-*/
-fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) {
+OUTPUT: Bool used in tests to determine if the function was successful.
+ */
+fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) -> bool {
     let p = env::current_dir().unwrap(); //ref 3
-    let mut path = p.display().to_string();
-    let test = &path[path.len() - 3..path.len()];
-    if test != "src" {
-        path += "/src";
+    let p2 = p.display().to_string();
+    let p3 = p2.split('/');
+    let mut path: String = String::new();
+    for i in p3 {
+        if i == "maze-runner" {
+            path = path + &i.to_string() + "/src/mazes/";
+            break;
+        }
+        path = path + &i.to_string() + "/";
     }
-    path += "/mazes/";
     //ref 3 start
     let mut data: String;
     let mut f = File::create(path + &name).expect("Could not find mazes directory.");
@@ -57,13 +61,14 @@ fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) {
         data += &"\n".to_string();
         f.write_all(data.as_bytes()).expect("Could not save maze.");
     }
+    true
     //ref 3 end
 }
 /*
 PURPOSE: This function will generate the randomly generated maze to the player's specifications.
 INPUT: a vec with the width and height of the maze, and the name of the maze as a string.
 OUTPUT: none
-*/
+ */
 pub fn generate_maze(info: Vec<String>, name: String) {
     let mut maze = Vec::new();
     let mut iter = 0;
@@ -104,7 +109,7 @@ pub fn generate_maze(info: Vec<String>, name: String) {
 PURPOSE: This function triggers the algorithm that will create the maze.  It does this by making two bisecting lines, opening a hole in three of the four resulting chambers and then repeating the process until the maze is complete.
 INPUT: A 2D vec of chars(the maze), the vertical start and end points of a chamber (xstart and xend), the horizontal start and end points of a chamber (ystart and yend), and a usice that lets the loading message know how many dots to add to the end of the loading message.  The loading message is used in the event that maze generation takes a while.
 OUTPUT: none
-*/
+ */
 //The idea for this algorithm was found in reference 7.
 fn recursive_maze_creation(
     mut maze: &mut std::vec::Vec<(Vec<(char)>)>,
@@ -194,54 +199,66 @@ fn recursive_maze_creation(
 PURPOSE: Load in a maze if the player choosese to load in a maze file.
 INPUT: The name of the file to load.
 OUTPUT: A 2D vec of chars (the maze).
-*/
+ */
 pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
     let p = env::current_dir().unwrap(); //ref 3
-    let mut path = p.display().to_string();
-    let test = &path[path.len() - 3..path.len()];
-    if test != "src" {
-        path += "/src";
+    let p2 = p.display().to_string();
+    let p3 = p2.split('/');
+    let mut path: String = String::new();
+    for i in p3 {
+        if i == "maze-runner" {
+            path = path + &i.to_string() + "/src/mazes/" + &file_name;
+            break;
+        }
+        path = path + &i.to_string() + "/";
     }
-    path = path + "/mazes/" + &file_name;
     //start ref 3
     let mut data = String::new();
-    let mut file = File::open(path).expect("Could not find directory 'mazes'");
-    file.read_to_string(&mut data)
-        .expect("Unable to read a line.");
-    //end ref 3
-    let mut maze = Vec::new();
-    let mut iter = 0;
-    let lines = data.split('\n');
-    for s in lines {
-        maze.push(Vec::new());
-        for i in s.chars() {
-            maze[iter].push(i);
+    if File::open(path.clone()).is_ok() {
+        let mut file = File::open(path).expect("Could not find directory 'mazes'");
+        file.read_to_string(&mut data)
+            .expect("Unable to read a line.");
+        //end ref 3
+        let mut maze = Vec::new();
+        let mut iter = 0;
+        let lines = data.split('\n');
+        for s in lines {
+            maze.push(Vec::new());
+            for i in s.chars() {
+                maze[iter].push(i);
+            }
+            iter += 1;
         }
-        iter += 1;
-    }
-    //This loop tests if any loaded maze if rectangular and returns an error if not.
-    for s in 0..maze.len() - 1 {
-        if maze[0].len() != maze[s].len() {
-            println!("ERROR: Length of each line is not uniform, please edit maze to have uniform line length.  Returing to main menu.");
-            //start ref 8
-            let mut stdout = stdout();
-            stdout
-                .write(b"Press Enter to retrn to main menu...")
-                .unwrap();
-            stdout.flush().unwrap();
-            stdin().read(&mut [0]).unwrap();
-            //end ref 8
-            println!("{}", clear::All); //ref 6
-            main_menu();
+        //This loop tests if any loaded maze if rectangular and returns an error if not.
+        for s in 0..maze.len() - 1 {
+            if maze[0].len() != maze[s].len() {
+                println!("ERROR: Length of each line is not uniform, please edit maze to have uniform line length.  Returing to main menu.");
+                //start ref 8
+                let mut stdout = stdout();
+                stdout
+                    .write(b"Press Enter to retrn to main menu...")
+                    .unwrap();
+                stdout.flush().unwrap();
+                stdin().read(&mut [0]).unwrap();
+                //end ref 8
+                println!("{}", clear::All); //ref 6
+                main_menu();
+            }
         }
+        return maze;
+    } else {
+        println!("{}", clear::All); //ref 6
+        println!("Could not find a maze called {}",file_name);
+        main_menu();
     }
-    maze
+    let empty = Vec::new();
+    empty
 }
 /*
 PURPOSE:This function sets up the player into the maze, sets the finish points, and begins the game loop.
 INPUT: A 2D vec of chars
 OUTPUT: none
-*/
+ */
 pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
     let mut player1 = Player {
         x: 0,
@@ -290,7 +307,7 @@ pub fn begin_game(maize: Vec<(Vec<(char)>)>) {
 PURPOSE: The main loop of the game, it continues to loop until the player quits or finishes the maze.
 INPUT: A player struct and a maze struct.
 OUTPUT: none
-*/
+ */
 fn game_loop(mut player1: Player, mut maze: Maze) {
     let mut direction;
     //The game loop will continue until the player overlaps with the finish character.
@@ -414,7 +431,7 @@ fn game_loop(mut player1: Player, mut maze: Maze) {
 PURPOSE: Reads player input and then returns a char code to tell the game loop what kind of input it is dealing with.
 INPUT: none
 OUTPUT: a single char.
-*/
+ */
 //beign reference 6
 fn get_input_direction() -> char {
     let stdin = stdin();
@@ -445,7 +462,7 @@ fn get_input_direction() -> char {
 PURPOSE: After each move the player makes, the commandl line is cleared and an updated maze is displayed.
 INPUT: a maze struct and a player struct.
 OUTPUT: none
-*/
+ */
 pub fn display_maze(maze: &Maze, player1: &Player) {
     println!("{}", clear::All); //ref 6
     let vert_window: u64 = 10;
@@ -515,7 +532,7 @@ pub fn display_maze(maze: &Maze, player1: &Player) {
 PURPOSE: Finds the start and finish points of the maze to populate the player and maze struct at the beginning of the game.
 INPUT: a 2d Vec of chars (the maze).
 OUTPUT: a 4-element array that contains the coordinates for the start and finish point of a maze.
-*/
+ */
 fn find_maze_points(maze: &[Vec<(char)>]) -> [u64; 4] {
     let mut coordinates: [u64; 4] = [
         (maze.len() + 1) as u64,

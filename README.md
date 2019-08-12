@@ -1,4 +1,4 @@
-# MazeRunner
+# maze_runner
 Hello!  Welcome to the Maze Runner Version 1.0!
 
 Before beginning I would like to point out that all references in code are in a references.txt file.  Here each reference is assigned a number and a comment is added in the code using the reference number.  If you see such a comment in the code, it matches with the references.txt file.  

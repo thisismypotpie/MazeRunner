@@ -1,5 +1,5 @@
 [package]
-name = "maze_runner"
+name = "maze-runner"
 version = "0.1.0"
 authors = ["bld <bld@pdx.edu>"]
 edition = "2018"
