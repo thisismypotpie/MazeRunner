@@ -113,12 +113,12 @@ pub fn generate_maze(info: Vec<String>, name: String) {
 }
 
 /*
-PURPOSE: This function triggers the algorithm that will create the maze.  It does this by making two bisecting lines, opening a hole in three of the four resulting chambers and then repeating the process until the maze is complete.
+PURPOSE: This function triggers the algorithm that will create the maze.  It does this by making two bisecting lines, opening a hole in three of the four resulting chambers and then repeating the process on each created maze section until the maze is complete.
 INPUT: A 2D vec of chars(the maze), the vertical start and end points of a chamber (xstart and xend), the horizontal start and end points of a chamber (ystart and yend), and a usice that lets the loading message know how many dots to add to the end of the loading message.  The loading message is used in the event that maze generation takes a while.
 OUTPUT: none
  */
 //The idea for this algorithm was found in reference 7.
-fn recursive_maze_creation(
+pub fn recursive_maze_creation(
     mut maze: &mut std::vec::Vec<(Vec<(char)>)>,
     xstart: usize,
     xend: usize,

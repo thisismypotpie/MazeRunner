@@ -102,9 +102,8 @@ mod tests {
         assert!(display_maze(&maze, &player1));
     }
 
-#[test]
-fn test_display_large_maze(){
-
+    #[test]
+    fn test_display_large_maze() {
         let mut test_maze = Vec::new();
         let mut iter = 0;
         let player1 = Player {
@@ -136,5 +135,5 @@ fn test_display_large_maze(){
             map: test_maze.clone(),
         };
         assert!(display_maze(&maze, &player1));
-}
+    }
 }
