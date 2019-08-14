@@ -41,28 +41,35 @@ PURPOSE: When a maze is randomly generated, this function will save that maze to
 INPUT: A 2D vec of chars and a string that is the name of the maze.
 OUTPUT: Bool used in tests to determine if the function was successful.
  */
-fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) -> bool {
+pub fn save_maze_to_file(maze: &mut std::vec::Vec<(Vec<(char)>)>, name: String) -> bool {
     let p = env::current_dir().unwrap(); //ref 3
     let p2 = p.display().to_string();
     let p3 = p2.split('/');
     let mut path: String = String::new();
     for i in p3 {
-        if i == "maze-runner" {
+        if i == "maze-runner" || i == "maze_runner" {
             path = path + &i.to_string() + "/src/mazes/";
             break;
         }
         path = path + &i.to_string() + "/";
     }
-    //ref 3 start
-    let mut data: String;
-    let mut f = File::create(path + &name).expect("Could not find mazes directory.");
-    for i in 0..maze.len() {
-        data = maze[i].clone().into_iter().collect();
-        data += &"\n".to_string();
-        f.write_all(data.as_bytes()).expect("Could not save maze.");
-    }
-    true
+    if File::open(path.clone()).is_ok() {
+        //ref 3 start
+        let mut data: String;
+        let mut f = File::create(path + &name).expect("Could not find mazes directory.");
+        for i in 0..maze.len() {
+            data = maze[i].clone().into_iter().collect();
+            data += &"\n".to_string();
+            f.write_all(data.as_bytes()).expect("Could not save maze.");
+        }
+        return true;
     //ref 3 end
+    } else {
+        println!("{}", clear::All); //ref 6
+        println!("Mazes file not found!");
+        main_menu();
+    }
+    false
 }
 /*
 PURPOSE: This function will generate the randomly generated maze to the player's specifications.
@@ -206,7 +213,7 @@ pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
     let p3 = p2.split('/');
     let mut path: String = String::new();
     for i in p3 {
-        if i == "maze-runner" {
+        if i == "maze-runner" || i == "maze_runner" {
             path = path + &i.to_string() + "/src/mazes/" + &file_name;
             break;
         }
@@ -248,7 +255,7 @@ pub fn load_maze(file_name: String) -> Vec<(Vec<(char)>)> {
         return maze;
     } else {
         println!("{}", clear::All); //ref 6
-        println!("Could not find a maze called {}",file_name);
+        println!("Could not find a maze called {}", file_name);
         main_menu();
     }
     let empty = Vec::new();
@@ -461,9 +468,9 @@ fn get_input_direction() -> char {
 /*
 PURPOSE: After each move the player makes, the commandl line is cleared and an updated maze is displayed.
 INPUT: a maze struct and a player struct.
-OUTPUT: none
+OUTPUT: a bool for testing purposes.
  */
-pub fn display_maze(maze: &Maze, player1: &Player) {
+pub fn display_maze(maze: &Maze, player1: &Player) -> bool {
     println!("{}", clear::All); //ref 6
     let vert_window: u64 = 10;
     let hor_window: u64 = 20;
@@ -526,6 +533,7 @@ pub fn display_maze(maze: &Maze, player1: &Player) {
         println!();
     }
     print!("{}", color::Fg(color::Reset));
+    true
 }
 
 /*
@@ -533,7 +541,7 @@ PURPOSE: Finds the start and finish points of the maze to populate the player an
 INPUT: a 2d Vec of chars (the maze).
 OUTPUT: a 4-element array that contains the coordinates for the start and finish point of a maze.
  */
-fn find_maze_points(maze: &[Vec<(char)>]) -> [u64; 4] {
+pub fn find_maze_points(maze: &[Vec<(char)>]) -> [u64; 4] {
     let mut coordinates: [u64; 4] = [
         (maze.len() + 1) as u64,
         (maze.len() + 1) as u64,

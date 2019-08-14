@@ -19,6 +19,7 @@ When you play the game from loading a maze or creating a new one, there are two 
 2. The HUD will let the player know where in the maze they are located.
 3. The HUD will let the player know where the exit tile of the maze is.
 4. The HUD will let the player know how many wall they can smash through.
+5. The maze itself will be displayed.  The amount of maze displayed will depend on how large the maze is.  In the running_alg.rs file, there is a vertical and horizontal window display intergers that allow the screen to display only a certain amount of characters so that the player screen in contained.  If the user wants a larger view screen, these parameters can be altered in the file itself.
 
 Additionally there is also a map of where the player is.  The player may move using the arrow keys or WASD.
 There are several characters to resemble different things in the maze. Here is a legend:
@@ -38,9 +39,9 @@ The user is also allows to go into mazes and create their own maze.  There are r
 
 Those are all of the basics needed to get started with this game.  Have fun and dont get lost in the mazes!
 
-
-ONE FINAL NOTE:
+FINAL NOTES:
 As you run clippy you will notice that there are errors and warnings that appear.  In the proces of cleaning up this project, I gave each and every error 45 minutes to solve.  In many ccases the warning or error could be solved however there were some errors and warning in which their advice ending up making larger errors which I could not solve.  If I could not solve the warning in 45 mimnutes, I moved on to the next one.  Here are the following statisitcs from clippy when I started vs when I finished:
 errors: 19/25 errors solved.
 warnings: 34/37 errors solved.
 
+Since I made a binary crate, I could only run my tests by adding them to main as a binary crate does not test with a different test directory.
